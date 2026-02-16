@@ -1,0 +1,20 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    background: black;
+}
+#canvas{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 5px solid white;
+    max-width: 100%;
+    max-height: 100%;
+}
+#lvl1BG, #lvl2BG, #lvl3BG, #lvl4BG, #lvl4BGSR, #lvl5BGD, #lvl5BG, #lvl5BGSR, #lvl6BG, #lvl6BGSR, #lvl7BG, #lvl7BGSR, #lvl7BGFR, #lvl7BGA{
+    display: none;
+}
