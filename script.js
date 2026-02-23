@@ -50,8 +50,6 @@ window.addEventListener("load", function(){
     else if(condition === 5){code = "ma"; implicitness = "moderate"; adaptability = "yes"}
     else if(condition === 6){code = "ia"; implicitness = "high"; adaptability = "yes"}
 
-    console.log(condition === 1 || condition === 6);
-
     let characters = '0123456789';
     let charsLen = characters.length;
     for(var i = 0; i < 6; i++){
@@ -1327,7 +1325,13 @@ window.addEventListener("load", function(){
         data.append("entry.1447842233", avgBPL);
         data.append("entry.2103162980", avgBPS);
 
-        navigator.sendBeacon(url, data);
+        fetch(formURL, {
+            method: "POST",
+            mode: "no-cors",  // important to prevent browser errors
+            body: data
+        }).then(() => {
+            console.log("Numbers saved to Google Sheets!");
+        });
     }
     animate(0);
 });
