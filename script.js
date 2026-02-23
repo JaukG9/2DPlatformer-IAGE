@@ -58,13 +58,8 @@ window.addEventListener("load", function(){
         code += characters.charAt(Math.floor(Math.random() * charsLen));
     }
 
-    window.addEventListener('beforeunload', (e) => {
-        e.preventDefault();
-
-        if(!dataSaved){
-            saveData();
-            dataSaved = true;
-        }
+    window.addEventListener("beforeunload", function(){
+        saveData();
     });
 
     window.addEventListener('resize', function(){
