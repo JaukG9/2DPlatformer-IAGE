@@ -1327,15 +1327,7 @@ window.addEventListener("load", function(){
         data.append("entry.1447842233", avgBPL);
         data.append("entry.2103162980", avgBPS);
 
-        setTimeout(() => {
-            fetch(formURL, {
-                method: "POST",
-                mode: "no-cors",  // important to prevent browser errors
-                body: data
-            }).then(() => {
-                console.log("Numbers saved to Google Sheets!");
-            });
-        }, 200);
+        navigator.sendBeacon(url, data);
     }
     animate(0);
 });
