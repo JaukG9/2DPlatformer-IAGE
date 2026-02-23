@@ -43,6 +43,8 @@ window.addEventListener("load", function(){
     let L7BP = 0;
     let totalButtonPresses = 0;
 
+    saveData();
+
     if(condition === 1){code = "nb"; implicitness = "low"; adaptability = "no"}
     else if(condition === 2){code = "mb"; implicitness = "moderate"; adaptability = "no"}
     else if(condition === 3){code = "ib"; implicitness = "high"; adaptability = "no"}
@@ -57,6 +59,8 @@ window.addEventListener("load", function(){
     }
 
     window.addEventListener('beforeunload', (e) => {
+        e.preventDefault();
+
         if(!dataSaved){
             saveData();
             dataSaved = true;
@@ -1325,13 +1329,15 @@ window.addEventListener("load", function(){
         data.append("entry.1447842233", avgBPL);
         data.append("entry.2103162980", avgBPS);
 
-        fetch(formURL, {
-            method: "POST",
-            mode: "no-cors",  // important to prevent browser errors
-            body: data
-        }).then(() => {
-            console.log("Numbers saved to Google Sheets!");
-        });
+        setTimeout(() => {
+            fetch(formURL, {
+                method: "POST",
+                mode: "no-cors",  // important to prevent browser errors
+                body: data
+            }).then(() => {
+                console.log("Numbers saved to Google Sheets!");
+            });
+        }, 100);
     }
     animate(0);
 });
