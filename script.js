@@ -6,6 +6,111 @@ window.addEventListener("load", function(){
     let canvasPosition = canvas.getBoundingClientRect();
 
     let gameTimer = 0;
+    let gameOver = false;
+
+    let condition = Math.floor(Math.random() * 6) + 1;
+    let code = "";
+    let implicitness = "";
+    let adaptability = "";
+    let L1Time = 0;
+    let L2Time = 0;
+    let L3Time = 0;
+    let L4Time = 0;
+    let L5Time = 0;
+    let L6Time = 0;
+    let L7Time = 0;
+    let totalTime = 0;
+    let L4Star = false;
+    let L5Star = false;
+    let L6Star = false;
+    let L7Star = false;
+    let totalStars = 0;
+    let L1Deaths = 0;
+    let L2Deaths = 0;
+    let L3Deaths = 0;
+    let L4Deaths = 0;
+    let L5Deaths = 0;
+    let L6Deaths = 0;
+    let L7Deaths = 0;
+    let totalDeaths = 0;
+    let L1BP = 0;
+    let L3BP = 0;
+    let L2BP = 0;
+    let L4BP = 0;
+    let L5BP = 0;
+    let L6BP = 0;
+    let L7BP = 0;
+    let totalButtonPresses = 0;
+
+    if(condition === 1){code = "nb"; implicitness = "low"; adaptability = "no"}
+    else if(condition === 2){code = "mb"; implicitness = "moderate"; adaptability = "no"}
+    else if(condition === 3){code = "ib"; implicitness = "high"; adaptability = "no"}
+    else if(condition === 4){code = "na"; implicitness = "low"; adaptability = "yes"}
+    else if(condition === 5){code = "ma"; implicitness = "moderate"; adaptability = "yes"}
+    else if(condition === 6){code = "ia"; implicitness = "high"; adaptability = "yes"}
+
+    console.log(condition === 1 || condition === 6);
+
+    let characters = '0123456789';
+    let charsLen = characters.length;
+    for(var i = 0; i < 6; i++){
+        code += characters.charAt(Math.floor(Math.random() * charsLen));
+    }
+
+    window.addEventListener('beforeunload', (e) => {
+        const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdwzPolLr7KLtthi7cN7kr4vipaGo9PVh5aHrGio8KJBERRQg/formResponse";
+        const data = new URLSearchParams();
+        totalTime = L1Time + L2Time + L3Time + L4Time + L5Time + L6Time + L7Time;
+        totalDeaths = L1Deaths + L2Deaths + L3Deaths + L4Deaths + L5Deaths + L6Deaths + L7Deaths;
+        totalButtonPresses = L1BP + L2BP + L3BP + L4BP + L5BP + L6BP + L7BP;
+        avgDL = totalDeaths / 7;
+        avgBPL = totalButtonPresses / 7;
+        avgBPS = totalButtonPresses / totalTime;
+
+        data.append("entry.1955057386", code);
+        data.append("entry.1993401091", implicitness);
+        data.append("entry.1157741162", adaptability);
+        data.append("entry.291193905", L1Time);
+        data.append("entry.329961467", L2Time);
+        data.append("entry.1676311474", L3Time);
+        data.append("entry.977434056", L4Time);
+        data.append("entry.391429005", L5Time);
+        data.append("entry.742161815", L6Time);
+        data.append("entry.569095564", L7Time);
+        data.append("entry.773165647", totalTime);
+        data.append("entry.1728185382", L4Star);
+        data.append("entry.442596606", L5Star);
+        data.append("entry.188403111", L6Star);
+        data.append("entry.118065855", L7Star);
+        data.append("entry.1806392904", totalStars);
+        data.append("entry.120527382", L1Deaths);
+        data.append("entry.1349664674", L2Deaths);
+        data.append("entry.71433522", L3Deaths);
+        data.append("entry.93379501", L4Deaths);
+        data.append("entry.306630458", L5Deaths);
+        data.append("entry.701475094", L6Deaths);
+        data.append("entry.1171473796", L7Deaths);
+        data.append("entry.192676016", totalDeaths);
+        data.append("entry.1656937526", L1BP);
+        data.append("entry.580726587", L2BP);
+        data.append("entry.1474541622", L3BP);
+        data.append("entry.872884090", L4BP);
+        data.append("entry.1312253188", L5BP);
+        data.append("entry.1356147104", L6BP);
+        data.append("entry.1559634866", L7BP);
+        data.append("entry.1215189062", totalButtonPresses);
+        data.append("entry.873547421", avgDL);
+        data.append("entry.1447842233", avgBPL);
+        data.append("entry.2103162980", avgBPS);
+
+        fetch(formURL, {
+            method: "POST",
+            mode: "no-cors",  // important to prevent browser errors
+            body: data
+        }).then(() => {
+            console.log("Numbers saved to Google Sheets!");
+        });
+    });
 
     window.addEventListener('resize', function(){
         canvasPosition = canvas.getBoundingClientRect();
@@ -31,12 +136,26 @@ window.addEventListener("load", function(){
             window.addEventListener('keydown', e => {
                 if(((e.key === 'ArrowDown' || e.key === 's') || (e.key === 'ArrowUp' || e.key === 'w') || (e.key === 'ArrowLeft' || e.key === 'a') || (e.key === 'ArrowRight' || e.key === 'd') || e.key === 'r' || (e.key === '1' || e.key === '2' || e.key === '3') || e.key === ' ') && this.keys.indexOf(e.key) === -1){
                     this.keys.push(e.key);
+                    if(levels.level === 1){L1BP++;}
+                    if(levels.level === 2){L2BP++;}
+                    if(levels.level === 3){L3BP++;}
+                    if(levels.level === 4){L4BP++;}
+                    if(levels.level === 5){L5BP++;}
+                    if(levels.level === 6){L6BP++;}
+                    if(levels.level === 7){L7BP++;}
                 }
             });
             window.addEventListener('keyup', e => {
                 if(((e.key === 'ArrowDown' || e.key === 's') || (e.key === 'ArrowUp' || e.key === 'w') || (e.key === 'ArrowLeft' || e.key === 'a') || (e.key === 'ArrowRight' || e.key === 'd') || e.key === 'r' || (e.key === '1' || e.key === '2' || e.key === '3') || e.key === ' ')){
                     if(this.keys.indexOf(e.key > -1)){
                         this.keys.splice(this.keys.indexOf(e.key), 1);
+                        if(levels.level === 1){L1BP++;}
+                        if(levels.level === 2){L2BP++;}
+                        if(levels.level === 3){L3BP++;}
+                        if(levels.level === 4){L4BP++;}
+                        if(levels.level === 5){L5BP++;}
+                        if(levels.level === 6){L6BP++;}
+                        if(levels.level === 7){L7BP++;}
                     }
                 }
             });
@@ -64,8 +183,22 @@ window.addEventListener("load", function(){
             this.width = 0;
             this.height = 0;
         }
-        update(context){
-
+        update(deltaTime){
+            if(this.level === 1){
+                L1Time += deltaTime / 1000;
+            }else if(this.level === 2){
+                L2Time += deltaTime / 1000;
+            }else if(this.level === 3){
+                L3Time += deltaTime / 1000;
+            }else if(this.level === 4){
+                L4Time += deltaTime / 1000;
+            }else if(this.level === 5){
+                L5Time += deltaTime / 1000;
+            }else if(this.level === 6){
+                L6Time += deltaTime / 1000;
+            }else if(this.level === 7){
+                L7Time += deltaTime / 1000;
+            }
         }
         draw(context){
             context.fillStyle = "red";
@@ -763,16 +896,21 @@ window.addEventListener("load", function(){
                 else if(this.level === 6){background.image = document.getElementById('lvl6BG'); this.levelStart = [10, canvas.height - player.height];}
                 else if(this.level === 7){background.image = document.getElementById('lvl7BG'); this.levelStart = [10, canvas.height - player.height];}
             }
+
+            if(this.level === 1){
+                ctx.fillStyle = "skyblue";
+                ctx.font = "60px Orbitron";
+                ctx.textAlign = "center";
+                ctx.fillText("Code: " + code, canvas.width / 2, 925);
+                ctx.textAlign = "left";
+            }
         }
-        update(context, deltaTime){
+        update(context, deltaTime, levelGlobal){
             if(this.level === 4){if(player.x + player.width <= 275){player.lowGravity = 3;}else{player.lowGravity = 0;}}
             else if(this.level === 5){
                 if(player.x + player.width > 1232 && player.x < 1364 && (background.image === document.getElementById('lvl5BG') || background.image === document.getElementById('lvl5BGSR'))){
                     player.vy = -10;
                 }
-                context.fillStyle = "white"; 
-                context.font = "25px Orbitron"; 
-                context.fillText("Press 'R' to Respawn", 1520, 1020);
             }else if(this.level === 6){
                 if(player.x + player.width > 386 && player.x - player.width < 435){
                     player.vy = -20;
@@ -854,10 +992,10 @@ window.addEventListener("load", function(){
                         player.LSCollected = false;
                         this.timer = 2;
                     }else if(potion.type === "STAR"){
-                        if(this.level === 4){background.image = document.getElementById('lvl4BGSR');}
-                        else if(this.level === 5){background.image = document.getElementById('lvl5BGSR');}
-                        else if(this.level === 6){background.image = document.getElementById('lvl6BGSR')}
-                        else if(this.level === 7){background.image = document.getElementById('lvl7BGSR');}
+                        if(this.level === 4){background.image = document.getElementById('lvl4BGSR'); L4Star = true; totalStars++;}
+                        else if(this.level === 5){background.image = document.getElementById('lvl5BGSR'); L5Star = true; totalStars++;}
+                        else if(this.level === 6){background.image = document.getElementById('lvl6BGSR'); L6Star = true; totalStars++;}
+                        else if(this.level === 7){background.image = document.getElementById('lvl7BGSR'); L7Star = true; totalStars++;}
                         this.bgChanged = true;
                     }else if(potion.type === "LS"){
                         player.doubleJumpLock = true;
@@ -883,7 +1021,17 @@ window.addEventListener("load", function(){
                 spike.draw(context);
 
                 if(player.x + player.width >= spike.x && player.x <= spike.x + spike.width && player.y + player.height >= spike.y && player.y <= spike.y + spike.height){
-                    if(player.invincibilityLock){this.restart = true; this.doubleJumpLock = true;}
+                    if(player.invincibilityLock){
+                        this.restart = true;
+                        this.doubleJumpLock = true;
+                        if(levelGlobal.level === 1){L1Deaths++;}
+                        else if(levelGlobal.level === 2){L2Deaths++;}
+                        else if(levelGlobal.level === 3){L3Deaths++;}
+                        else if(levelGlobal.level === 4){L4Deaths++;}
+                        else if(levelGlobal.level === 5){L5Deaths++;}
+                        else if(levelGlobal.level === 6){L6Deaths++;}
+                        else if(levelGlobal.level === 7){L7Deaths++;}
+                    }
                     else{
                         this.startCount = true;
                     }
@@ -937,13 +1085,21 @@ window.addEventListener("load", function(){
                 if(player.x + player.width > enemy.x && player.x < enemy.x + enemy.width && player.y + player.height > enemy.y && player.y < enemy.y + enemy. height){
                     if(player.invincibilityLock){
                         this.restart = true; 
-                        this.doubleJumpLock = true;}
-                    else{
+                        this.doubleJumpLock = true;
+                        if(levelGlobal.level === 1){L1Deaths++;}
+                        else if(levelGlobal.level === 2){L2Deaths++;}
+                        else if(levelGlobal.level === 3){L3Deaths++;}
+                        else if(levelGlobal.level === 4){L4Deaths++;}
+                        else if(levelGlobal.level === 5){L5Deaths++;}
+                        else if(levelGlobal.level === 6){L6Deaths++;}
+                        else if(levelGlobal.level === 7){L7Deaths++;}
+                    }else{
                         this.startCount = true; 
                         enemy.x = 10000; 
                         enemy.vx = 0; 
                         if(this.level === 7 && enemy.color === "lime"){background.image = document.getElementById('lvl7BGFR');}
-                        this.enemiesKilled++;}
+                        this.enemiesKilled++;
+                    }
                 }
                 if(this.level === 5 && this.enemiesKilled === 1 && background.image !== document.getElementById('lvl5BGSR')){background.image = document.getElementById('lvl5BG'); this.bgChanged = true;}
                 else if(this.level === 7 && this.enemiesKilled === 1){background.image = document.getElementById('lvl7BGFR'); this.bgChanged = true;}
@@ -974,13 +1130,17 @@ window.addEventListener("load", function(){
 
             //Level Detector
             if((this.level <= 7) && player.x + player.width >= canvas.width){
-                if(!(this.level === 7 && player.y + player.height > 540)){this.endingReached = true; console.log(this.level);}
+                if(!(this.level === 7 && player.y + player.height > 540)){
+                    if(this.level !== 7){
+                        this.endingReached = true;
+                    }else{gameOver = true;}
+                }
             }
             if(input.keys.indexOf('r') > -1){
                 this.restart = true;
             }
 
-            if(this.endingReached){
+            if(this.endingReached && !gameOver){
                 this.surfaceMax = this.objects.surfaces[this.level].length;
                 this.potionMax = this.objects.potions[this.level].length;
                 this.spikeMax = this.objects.spikes[this.level].length;
@@ -996,6 +1156,7 @@ window.addEventListener("load", function(){
                 this.bgChanged = false;
                 this.startCount = false;
                 this.level++;
+                levelGlobal.level++;
                 this.enemiesKilled = 0;
                 this.getElement();
                 this.backgrounds();
@@ -1027,6 +1188,7 @@ window.addEventListener("load", function(){
             if(this.type === "invis"){context.fillStyle = "rgba(0,0,0,0)";}
             else if(this.type === "brown"){context.fillStyle = "brown";}
             context.fillRect(this.x,this.y,this.width,this.height);
+            context.fillStyle = "orange";
         }
     }
     class Potion{
@@ -1089,31 +1251,24 @@ window.addEventListener("load", function(){
             this.fillStyle = "white";
             this.font = "60px Orbitron";
             if(surface.level === 1){
-                this.x = 430
                 this.y = 180
                 this.message = "WASD or Arrow Keys to Move"
             }else if(surface.level === 2){
-                this.x = 390;
                 this.y = 180;
                 this.message = "Green Potions Allow Double Jumps"
             }else if(surface.level === 3){
-                this.x = 360;
                 this.y = 180;
                 this.message = "Red Potions Allow 1-Time Incincibility"
             }else if(surface.level === 4 && !surface.bgChanged){
-                this.x = 390;
                 this.y = 180;
                 this.message = "Blue Sections mean Low Gravity"
             }else if(surface.level === 4){
-                this.x = 360;
                 this.y = 180;
                 this.message = "Collect Stars for Bonus Levels at End"
             }else if(surface.level === 5){
-                this.x = 360;
                 this.y = 240;
                 this.message = "Grab Blue Potion - Go in Enemy Range"
             }else if(surface.level === 6){
-                this.x = 585;
                 this.y = 1040;
                 this.fillStyle = "black"
                 this.font = "40px Orbitron"
@@ -1125,15 +1280,17 @@ window.addEventListener("load", function(){
         draw(context){
             context.fillStyle = this.fillStyle;
             context.font = this.font;
-            context.fillText(this.message, this.x, this.y);
+            context.textAlign = "center";
+            context.fillText(this.message, canvas.width / 2, this.y);
+            context.textAlign = "left";
         }
     }
 
+    const levels = new Levels();
     const input = new InputHandler();
     const background = new Background();
     const player = new Player();
     const surface = new Surface();
-    const levels = new Levels();
     const message = new Messages();
 
     surface.getElement();
@@ -1141,22 +1298,32 @@ window.addEventListener("load", function(){
 
     let lastTime = 0;
     function animate(timeStamp){
-        const deltaTime = timeStamp - lastTime
-        lastTime = timeStamp;
+        if(!gameOver){
+            const deltaTime = timeStamp - lastTime;
+            lastTime = timeStamp;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        background.draw(ctx);
-        levels.draw(ctx);
-        levels.update(ctx);
-        player.update(input);
-        player.draw(ctx);
-        surface.backgrounds(ctx);
-        surface.update(ctx, deltaTime);
-        message.update();
-        message.draw(ctx);
-        gameTimer++;
-
-        requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            background.draw(ctx);
+            levels.draw(ctx);
+            levels.update(deltaTime);
+            player.update(input);
+            surface.update(ctx, deltaTime, levels);
+            player.draw(ctx);
+            surface.backgrounds(ctx);
+            message.update();
+            if(condition != 3 && condition != 6){message.draw(ctx);}
+            gameTimer++;
+            requestAnimationFrame(animate);
+        }else if(gameOver){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.font = "100px Orbitron";
+            ctx.textAlign = "center";
+            ctx.fillText("You Finished", canvas.width / 2, canvas.height / 2 - 30);
+            ctx.fillStyle = "skyblue";
+            ctx.font = "80px Orbitron";
+            ctx.fillText(code, canvas.width / 2, canvas.height / 2 + 100);
+        }
     }
     animate(0);
 });
