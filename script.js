@@ -110,6 +110,8 @@ window.addEventListener("load", function(){
         }).then(() => {
             console.log("Numbers saved to Google Sheets!");
         });
+
+        e.preventDefault();
     });
 
     window.addEventListener('resize', function(){
@@ -1326,4 +1328,5 @@ window.addEventListener("load", function(){
         }
     }
     animate(0);
+
 });
