@@ -7,6 +7,7 @@ window.addEventListener("load", function(){
 
     let gameTimer = 0;
     let gameOver = false;
+    let dataSaved = false;
 
     let condition = Math.floor(Math.random() * 6) + 1;
     let code = "";
@@ -58,58 +59,10 @@ window.addEventListener("load", function(){
     }
 
     window.addEventListener('beforeunload', (e) => {
-        const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdwzPolLr7KLtthi7cN7kr4vipaGo9PVh5aHrGio8KJBERRQg/formResponse";
-        const data = new URLSearchParams();
-        totalTime = L1Time + L2Time + L3Time + L4Time + L5Time + L6Time + L7Time;
-        totalDeaths = L1Deaths + L2Deaths + L3Deaths + L4Deaths + L5Deaths + L6Deaths + L7Deaths;
-        totalButtonPresses = L1BP + L2BP + L3BP + L4BP + L5BP + L6BP + L7BP;
-        avgDL = totalDeaths / 7;
-        avgBPL = totalButtonPresses / 7;
-        avgBPS = totalButtonPresses / totalTime;
-
-        data.append("entry.1955057386", code);
-        data.append("entry.1993401091", implicitness);
-        data.append("entry.1157741162", adaptability);
-        data.append("entry.291193905", L1Time);
-        data.append("entry.329961467", L2Time);
-        data.append("entry.1676311474", L3Time);
-        data.append("entry.977434056", L4Time);
-        data.append("entry.391429005", L5Time);
-        data.append("entry.742161815", L6Time);
-        data.append("entry.569095564", L7Time);
-        data.append("entry.773165647", totalTime);
-        data.append("entry.1728185382", L4Star);
-        data.append("entry.442596606", L5Star);
-        data.append("entry.188403111", L6Star);
-        data.append("entry.118065855", L7Star);
-        data.append("entry.1806392904", totalStars);
-        data.append("entry.120527382", L1Deaths);
-        data.append("entry.1349664674", L2Deaths);
-        data.append("entry.71433522", L3Deaths);
-        data.append("entry.93379501", L4Deaths);
-        data.append("entry.306630458", L5Deaths);
-        data.append("entry.701475094", L6Deaths);
-        data.append("entry.1171473796", L7Deaths);
-        data.append("entry.192676016", totalDeaths);
-        data.append("entry.1656937526", L1BP);
-        data.append("entry.580726587", L2BP);
-        data.append("entry.1474541622", L3BP);
-        data.append("entry.872884090", L4BP);
-        data.append("entry.1312253188", L5BP);
-        data.append("entry.1356147104", L6BP);
-        data.append("entry.1559634866", L7BP);
-        data.append("entry.1215189062", totalButtonPresses);
-        data.append("entry.873547421", avgDL);
-        data.append("entry.1447842233", avgBPL);
-        data.append("entry.2103162980", avgBPS);
-
-        fetch(formURL, {
-            method: "POST",
-            mode: "no-cors",  // important to prevent browser errors
-            body: data
-        }).then(() => {
-            console.log("Numbers saved to Google Sheets!");
-        });
+        if(!dataSaved){
+            saveData();
+            dataSaved = true;
+        }
     });
 
     window.addEventListener('resize', function(){
@@ -1323,9 +1276,64 @@ window.addEventListener("load", function(){
             ctx.fillStyle = "skyblue";
             ctx.font = "80px Orbitron";
             ctx.fillText(code, canvas.width / 2, canvas.height / 2 + 100);
+
+            saveData();
+            dataSaved = true;
         }
     }
+    function saveData(){
+        const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdwzPolLr7KLtthi7cN7kr4vipaGo9PVh5aHrGio8KJBERRQg/formResponse";
+        const data = new URLSearchParams();
+        totalTime = L1Time + L2Time + L3Time + L4Time + L5Time + L6Time + L7Time;
+        totalDeaths = L1Deaths + L2Deaths + L3Deaths + L4Deaths + L5Deaths + L6Deaths + L7Deaths;
+        totalButtonPresses = L1BP + L2BP + L3BP + L4BP + L5BP + L6BP + L7BP;
+        avgDL = totalDeaths / 7;
+        avgBPL = totalButtonPresses / 7;
+        avgBPS = totalButtonPresses / totalTime;
+
+        data.append("entry.1955057386", code);
+        data.append("entry.1993401091", implicitness);
+        data.append("entry.1157741162", adaptability);
+        data.append("entry.291193905", L1Time);
+        data.append("entry.329961467", L2Time);
+        data.append("entry.1676311474", L3Time);
+        data.append("entry.977434056", L4Time);
+        data.append("entry.391429005", L5Time);
+        data.append("entry.742161815", L6Time);
+        data.append("entry.569095564", L7Time);
+        data.append("entry.773165647", totalTime);
+        data.append("entry.1728185382", L4Star);
+        data.append("entry.442596606", L5Star);
+        data.append("entry.188403111", L6Star);
+        data.append("entry.118065855", L7Star);
+        data.append("entry.1806392904", totalStars);
+        data.append("entry.120527382", L1Deaths);
+        data.append("entry.1349664674", L2Deaths);
+        data.append("entry.71433522", L3Deaths);
+        data.append("entry.93379501", L4Deaths);
+        data.append("entry.306630458", L5Deaths);
+        data.append("entry.701475094", L6Deaths);
+        data.append("entry.1171473796", L7Deaths);
+        data.append("entry.192676016", totalDeaths);
+        data.append("entry.1656937526", L1BP);
+        data.append("entry.580726587", L2BP);
+        data.append("entry.1474541622", L3BP);
+        data.append("entry.872884090", L4BP);
+        data.append("entry.1312253188", L5BP);
+        data.append("entry.1356147104", L6BP);
+        data.append("entry.1559634866", L7BP);
+        data.append("entry.1215189062", totalButtonPresses);
+        data.append("entry.873547421", avgDL);
+        data.append("entry.1447842233", avgBPL);
+        data.append("entry.2103162980", avgBPS);
+
+        fetch(formURL, {
+            method: "POST",
+            mode: "no-cors",  // important to prevent browser errors
+            body: data
+        }).then(() => {
+            console.log("Numbers saved to Google Sheets!");
+        });
+    }
     animate(0);
-
 });
-
