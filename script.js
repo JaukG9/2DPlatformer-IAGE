@@ -43,8 +43,6 @@ window.addEventListener("load", function(){
     let L7BP = 0;
     let totalButtonPresses = 0;
 
-    saveData();
-
     if(condition === 1){code = "nb"; implicitness = "low"; adaptability = "no"}
     else if(condition === 2){code = "mb"; implicitness = "moderate"; adaptability = "no"}
     else if(condition === 3){code = "ib"; implicitness = "high"; adaptability = "no"}
@@ -57,10 +55,6 @@ window.addEventListener("load", function(){
     for(var i = 0; i < 6; i++){
         code += characters.charAt(Math.floor(Math.random() * charsLen));
     }
-
-    window.addEventListener("beforeunload", function(){
-        saveData();
-    });
 
     window.addEventListener('resize', function(){
         canvasPosition = canvas.getBoundingClientRect();
@@ -79,6 +73,11 @@ window.addEventListener("load", function(){
     canvas.addEventListener("click", function(){
   
     });
+
+    window.addEventListener('beforeunload', (event) => {
+        saveData();
+    });
+
 
     class InputHandler{
         constructor(){
@@ -179,6 +178,9 @@ window.addEventListener("load", function(){
             this.doubleJumpLock = true;
             this.invincibilityLock = true;
             this.lowGravity = 0;
+            this.effectAmt = 0;
+            this.dJImg = document.getElementById("doubleJump");
+            this.invImg = document.getElementById("invincibility");
         }
         update(input){
             //Smooth Controls
@@ -254,6 +256,22 @@ window.addEventListener("load", function(){
                 context.arc(this.x + (this.width / 2), this.y + (this.width / 2), 80, 0, 2 * Math.PI, false);
                 context.fill();
                 context.stroke();
+            }
+
+            if(implicitness != "high"){
+                this.effectAmt = 0;
+                if(!this.invincibilityLock){
+                    context.globalAlpha = 0.75;
+                    context.drawImage(this.invImg, canvas.width - 90, 25, 70, 70);
+                    context.globalAlpha = 1;
+                    this.effectAmt++;
+                }
+                if(!this.doubleJumpLock){
+                    context.globalAlpha = 0.75;
+                    context.drawImage(this.dJImg, canvas.width - 90 - this.effectAmt * 60, 30, 70, 55);
+                    context.globalAlpha = 1;
+                    this.effectAmt++;
+                }
             }
         }
     }
@@ -870,8 +888,14 @@ window.addEventListener("load", function(){
                 }else if(player.x > 1345 && player.x < 1391){
                     if(!(this.countDown > 20))player.invincibilityLock = true;
                 }else{player.lowGravity = 0;}
-            }else if(this.level === 7 && player.x > 610 && player.x < 695 && player.y < 370 && (background.image === document.getElementById('lvl7BGA') || background.image === document.getElementById('lvl7BGSR'))){
-                player.vy = -50;
+            }else if(this.level === 7){
+                if(player.x > 610 && player.x < 695 && player.y < 370 && (background.image === document.getElementById('lvl7BGA') || background.image === document.getElementById('lvl7BGSR'))){
+                    player.vy = -50;
+                }
+                if(player.x > 435 && player.x < 515 && player.y < 143){
+                    if(!(this.countDown > 20)){player.invincibilityLock = true;}
+                    player.doubleJumpLock = true;
+                }
             }
 
             //Surface Stuff
@@ -932,14 +956,14 @@ window.addEventListener("load", function(){
 
                     if(potion.type === "DJ"){
                         player.doubleJumpLock = false;
-                        player.invincibilityLock = true;
+                        //player.invincibilityLock = true;
                         player.doubleJumped = false;
-                        player.LSCollected = false;
+                        //player.LSCollected = false;
                         this.timer = 0;
                     }else if(potion.type === "IN"){
-                        player.doubleJumpLock = true;
+                        //player.doubleJumpLock = true;
                         player.invincibilityLock = false;
-                        player.LSCollected = false;
+                        //player.LSCollected = false;
                         this.timer = 2;
                     }else if(potion.type === "STAR"){
                         if(this.level === 4){background.image = document.getElementById('lvl4BGSR'); L4Star = true; totalStars++;}
@@ -948,9 +972,9 @@ window.addEventListener("load", function(){
                         else if(this.level === 7){background.image = document.getElementById('lvl7BGSR'); L7Star = true; totalStars++;}
                         this.bgChanged = true;
                     }else if(potion.type === "LS"){
-                        player.doubleJumpLock = true;
-                        player.invincibilityLock = true;
-                        player.doubleJumped = false;
+                        //player.doubleJumpLock = true;
+                        //player.invincibilityLock = true;
+                        //player.doubleJumped = false;
                         player.LSCollected = true;
                     }
                 }
@@ -1200,31 +1224,32 @@ window.addEventListener("load", function(){
         update(){
             this.fillStyle = "white";
             this.font = "60px Orbitron";
-            if(surface.level === 1){
-                this.y = 180
-                this.message = "WASD or Arrow Keys to Move"
-            }else if(surface.level === 2){
+            this.message = "";
+            if(surface.level === 1 && (implicitness == "low")){
                 this.y = 180;
-                this.message = "Green Potions Allow Double Jumps"
-            }else if(surface.level === 3){
+                this.message = "WASD or Arrow Keys to Move";
+            }else if(surface.level === 2 && (implicitness == "low")){
                 this.y = 180;
-                this.message = "Red Potions Allow 1-Time Incincibility"
-            }else if(surface.level === 4 && !surface.bgChanged){
+                this.message = "Green Potions Allow Double Jumps";
+            }else if(surface.level === 3 && (implicitness == "low")){
                 this.y = 180;
-                this.message = "Blue Sections mean Low Gravity"
+                this.message = "Red Potions Allow 1-Time Incincibility";
+            }else if(surface.level === 4 && !surface.bgChanged && !(implicitness == "high")){
+                this.y = 180;
+                this.message = "Blue Sections mean Low Gravity";
             }else if(surface.level === 4){
                 this.y = 180;
-                this.message = "Collect Stars for Bonus Levels at End"
-            }else if(surface.level === 5){
+                this.message = "Collect Stars for Extra Points";
+            }else if(surface.level === 5 && (implicitness == "low")){
                 this.y = 240;
-                this.message = "Grab Blue Potion - Go in Enemy Range"
-            }else if(surface.level === 6){
+                this.message = "Grab Blue Potion - Go in Enemy Range";
+            }else if(surface.level === 6 && !(implicitness == "high")){
                 this.y = 1040;
-                this.fillStyle = "black"
-                this.font = "40px Orbitron"
-                this.message = "White Bar Clears Potion Effects"
+                this.fillStyle = "black";
+                this.font = "40px Orbitron";
+                this.message = "White Bar Clears Potion Effects";
             }else if(surface.level === 7){
-                this.message = ""
+                this.message = "";
             }
         }
         draw(context){
@@ -1261,7 +1286,7 @@ window.addEventListener("load", function(){
             player.draw(ctx);
             surface.backgrounds(ctx);
             message.update();
-            if(condition != 3 && condition != 6){message.draw(ctx);}
+            message.draw(ctx);
             gameTimer++;
             requestAnimationFrame(animate);
         }else if(gameOver){
@@ -1324,15 +1349,14 @@ window.addEventListener("load", function(){
         data.append("entry.1447842233", avgBPL);
         data.append("entry.2103162980", avgBPS);
 
-        setTimeout(() => {
-            fetch(formURL, {
-                method: "POST",
-                mode: "no-cors",  // important to prevent browser errors
-                body: data
-            }).then(() => {
-                console.log("Numbers saved to Google Sheets!");
-            });
-        }, 100);
+        fetch(formURL, {
+            method: "POST",
+            mode: "no-cors",  // important to prevent browser errors
+            body: data
+        }).then(() => {
+            console.log("Numbers saved to Google Sheets!");
+        });
     }
+
     animate(0);
 });
