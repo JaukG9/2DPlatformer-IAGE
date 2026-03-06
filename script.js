@@ -42,8 +42,6 @@ window.addEventListener("load", function(){
     let L6BP = 0;
     let L7BP = 0;
     let totalButtonPresses = 0;
-
-    saveData();
     
     if(condition === 1){code = "nb"; implicitness = "low"; adaptability = "no"}
     else if(condition === 2){code = "mb"; implicitness = "moderate"; adaptability = "no"}
@@ -95,9 +93,12 @@ window.addEventListener("load", function(){
                     if(levels.level === 6){L6BP++;}
                     if(levels.level === 7){L7BP++;}
                 }
+                if(e.key === 'p' && this.keys.indexOf(e.key) === -1){
+                    saveData();
+                }
             });
             window.addEventListener('keyup', e => {
-                if(((e.key === 'ArrowDown' || e.key === 's') || (e.key === 'ArrowUp' || e.key === 'w') || (e.key === 'ArrowLeft' || e.key === 'a') || (e.key === 'ArrowRight' || e.key === 'd') || e.key === 'r' || (e.key === '1' || e.key === '2' || e.key === '3') || e.key === ' ')){
+                if(((e.key === 'ArrowDown' || e.key === 's') || (e.key === 'ArrowUp' || e.key === 'w') || (e.key === 'ArrowLeft' || e.key === 'a') || (e.key === 'ArrowRight' || e.key === 'd') || e.key === 'r' || (e.key === '1' || e.key === '2' || e.key === '3') || e.key === ' ' || e.key === 'p')){
                     if(this.keys.indexOf(e.key > -1)){
                         this.keys.splice(this.keys.indexOf(e.key), 1);
                         if(levels.level === 1){L1BP++;}
@@ -1363,5 +1364,6 @@ window.addEventListener("load", function(){
     animate(0);
 
 });
+
 
 
