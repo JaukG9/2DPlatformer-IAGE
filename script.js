@@ -43,6 +43,8 @@ window.addEventListener("load", function(){
     let L7BP = 0;
     let totalButtonPresses = 0;
 
+    saveData();
+    
     if(condition === 1){code = "nb"; implicitness = "low"; adaptability = "no"}
     else if(condition === 2){code = "mb"; implicitness = "moderate"; adaptability = "no"}
     else if(condition === 3){code = "ib"; implicitness = "high"; adaptability = "no"}
@@ -1361,4 +1363,5 @@ window.addEventListener("load", function(){
     animate(0);
 
 });
+
 
