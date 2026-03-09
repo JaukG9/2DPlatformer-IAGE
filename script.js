@@ -1134,6 +1134,7 @@ window.addEventListener("load", function(){
                 this.startCount = false;
                 this.level++;
                 levelGlobal.level++;
+                saveData();
                 this.enemiesKilled = 0;
                 this.getElement();
                 this.backgrounds();
