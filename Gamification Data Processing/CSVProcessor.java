@@ -94,7 +94,7 @@ public class CSVProcessor {
                 if (surveyRow.length >= 7) {
                     String key = surveyRow[6];
 
-                    if (dataMap.containsKey(key)) {
+                    if (dataMap.containsKey(key) && !surveyRow[11].equals("Yes")) {
                         String[] iageRow = dataMap.get(key);
 
                         String[] combinedRow = new String[surveyRow.length + iageRow.length];
