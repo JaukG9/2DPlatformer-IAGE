@@ -22,7 +22,7 @@ This repository contains the custom game, processing files, and analysis files f
 | `Data Analysis` | `analysis_results.pdf`<br>`analysis_summary.csv`<br>`data_analysis.R` | Code and results for the statistical analysis of the processed data
 | `Data Processing` | `CSVProcessor.java`<br>`Combined_Data.csv`<br>`IAGEData.csv`<br>`Processed_IAGEData.csv`<br>`surveyResponses.csv` | Code and files for the processing of survey and playthrough data into a combined CSV file
 | `Game` | `images/BGs`<br>`index.html`<br>`sript.js`<br>`style.css` | Code for the custom game played by participants in the study, and hosted on GitHub Pages
-|  | `research_dashboard.html` | Interactive results dashboard with 7 tabbed sections and Chart.js visualizations.
+|  | `research_dashboard.html` | Interactive results dashboard with 8 tabbed sections and Chart.js visualizations.
 
 ### Access GitHub Pages
 > Access the [game here](https://jaukg9.github.io/2DPlatformer-IAGE/Game)<br>
