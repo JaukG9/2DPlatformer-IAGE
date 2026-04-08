@@ -1308,6 +1308,8 @@ window.addEventListener("load", function(){
         }
     }
     function saveData(){
+        /*
+
         const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdwzPolLr7KLtthi7cN7kr4vipaGo9PVh5aHrGio8KJBERRQg/formResponse";
         const data = new URLSearchParams();
         totalTime = L1Time + L2Time + L3Time + L4Time + L5Time + L6Time + L7Time;
@@ -1360,6 +1362,8 @@ window.addEventListener("load", function(){
         }).then(() => {
             console.log("Numbers saved to Google Sheets!");
         });
+
+        */
     }
 
     animate(0);
