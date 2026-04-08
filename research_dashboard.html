@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gamified Education Research Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --blue: #185FA5; --teal: #1D9E75; --coral: #D85A30;
+    --purple: #534AB7; --amber: #BA7517;
+    --blue-l: #B5D4F4; --teal-l: #9FE1CB; --coral-l: #F5C4B3;
+    --purple-l: #CECBF6; --amber-l: #FAC775;
+    --gray: #888780; --gray-l: #F1EFE8; --gray-m: #B4B2A9;
+    --bg: #ffffff; --bg2: #f8f7f4; --bg3: #f1efe8;
+    --text: #1a1a18; --text2: #5f5e5a; --text3: #888780;
+    --border: rgba(136,135,128,0.2);
+    --grid: rgba(136,135,128,0.15);
+    --radius: 10px; --radius-sm: 6px;
+    --sig: #eaf3de; --sig-t: #27500A;
+    --marg: #faeeda; --marg-t: #633806;
+    --ns: #f1efe8; --ns-t: #444441;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Georgia', serif;
+    background: var(--bg2);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 2.5rem 1.5rem;
+    position: sticky; top: 0; z-index: 100;
+  }
+  header h1 {
+    font-size: 1.4rem; font-weight: normal; letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  header p { font-size: 0.8rem; color: var(--text3); margin-top: 4px; font-family: 'Courier New', monospace; }
+
+  /* ── Nav tabs ── */
+  nav {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2.5rem;
+    display: flex; gap: 0; overflow-x: auto;
+  }
+  nav button {
+    background: none; border: none; cursor: pointer;
+    font-family: 'Georgia', serif; font-size: 0.8rem;
+    color: var(--text3); padding: 0.75rem 1.25rem;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap; transition: all 0.15s;
+  }
+  nav button:hover { color: var(--text); }
+  nav button.active { color: var(--text); border-bottom-color: var(--blue); }
+
+  /* ── Layout ── */
+  main { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-header { margin-bottom: 1.5rem; }
+  .section-header h2 { font-size: 1.1rem; font-weight: normal; color: var(--text); }
+  .section-header p { font-size: 0.8rem; color: var(--text3); margin-top: 4px; line-height: 1.6; }
+
+  /* ── Cards ── */
+  .metric-row { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .metric-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 0.9rem 1rem;
+  }
+  .metric-card .label { font-size: 0.7rem; color: var(--text3); font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+  .metric-card .value { font-size: 1.6rem; font-weight: normal; color: var(--text); line-height: 1; }
+  .metric-card .sub { font-size: 0.7rem; color: var(--text3); margin-top: 4px; }
+
+  /* ── Chart grid ── */
+  .g1 { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
+  .g2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-bottom: 16px; }
+  .g3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; margin-bottom: 16px; }
+
+  .chart-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem;
+  }
+  .chart-card .ct { font-size: 0.85rem; font-weight: normal; color: var(--text); margin-bottom: 2px; }
+  .chart-card .cs { font-size: 0.72rem; color: var(--text3); margin-bottom: 12px; line-height: 1.5; }
+  .canvas-wrap { position: relative; width: 100%; }
+
+  /* ── Legend ── */
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-size: 0.72rem; color: var(--text2); }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .sl { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  /* ── Badges ── */
+  .badges { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .badge {
+    display: inline-block; font-size: 0.68rem; font-weight: normal;
+    padding: 2px 7px; border-radius: 3px;
+    font-family: 'Courier New', monospace;
+  }
+  .badge.sig  { background: var(--sig);  color: var(--sig-t); }
+  .badge.marg { background: var(--marg); color: var(--marg-t); }
+  .badge.ns   { background: var(--ns);   color: var(--ns-t); }
+
+  /* ── Sig table ── */
+  .sig-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 8px; }
+  .sig-table th { text-align: left; font-weight: normal; font-size: 0.68rem; color: var(--text3); font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.05em; padding: 5px 8px; border-bottom: 1px solid var(--border); }
+  .sig-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  .sig-table tr:last-child td { border-bottom: none; }
+
+  /* ── Divider label ── */
+  .divider { font-size: 0.68rem; font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 3px 10px; display: inline-block; margin-bottom: 10px; }
+
+  /* ── Footer ── */
+  .footnote { font-size: 0.68rem; color: var(--text3); margin-top: 1rem; line-height: 1.7; font-family: 'Courier New', monospace; border-top: 1px solid var(--border); padding-top: 0.75rem; }
+
+  @media (max-width: 700px) {
+    .g2, .g3 { grid-template-columns: 1fr; }
+    .metric-row { grid-template-columns: repeat(2, 1fr); }
+    header, nav { padding-left: 1rem; padding-right: 1rem; }
+    main { padding: 1rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Implicitness &amp; Adaptability in Gamified Education — Results Dashboard</h1>
+  <p>N = 90 participants · Ages 14–18 · High school · Conditions randomly assigned</p>
+</header>
+
+<nav id="nav">
+  <button class="active" data-tab="overview">Overview</button>
+  <button data-tab="survey">Survey composites</button>
+  <button data-tab="items">All 10 items</button>
+  <button data-tab="performance">Performance</button>
+  <button data-tab="levels">Per-level analysis</button>
+  <button data-tab="completion">Completion</button>
+  <button data-tab="interaction">Interactions</button>
+</nav>
+
+<main>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<section class="section active" id="tab-overview">
+  <div class="section-header">
+    <h2>Study overview</h2>
+    <p>Summary of conditions, sample, and headline findings across all metrics.</p>
+  </div>
+
+  <div class="metric-row">
+    <div class="metric-card"><div class="label">Participants</div><div class="value">90</div><div class="sub">High school, ages 14–18</div></div>
+    <div class="metric-card"><div class="label">Implicitness groups</div><div class="value">3</div><div class="sub">Low (25) · Moderate (37) · High (28)</div></div>
+    <div class="metric-card"><div class="label">Adaptability groups</div><div class="value">2</div><div class="sub">No (52) · Yes (38)</div></div>
+    <div class="metric-card"><div class="label">Overall completion</div><div class="value">46.7%</div><div class="sub">42 of 90 players finished</div></div>
+  </div>
+
+  <div class="metric-row">
+    <div class="metric-card"><div class="label">Sig. findings (p&lt;.05)</div><div class="value">4</div><div class="sub">Engagement, scaffolding, L6 BP, L7 BP</div></div>
+    <div class="metric-card"><div class="label">Marginal (p&lt;.10)</div><div class="value">3</div><div class="sub">Enjoyment, completion, L2 time</div></div>
+    <div class="metric-card"><div class="label">Outliers removed</div><div class="value">7</div><div class="sub">Deaths &amp; time (N→83); BPS (N→87); Stars (N→84)</div></div>
+    <div class="metric-card"><div class="label">Interaction sig.</div><div class="value">0</div><div class="sub">Enjoyment marginal p=0.063†</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Completion rate by implicitness</div>
+      <div class="cs">Low implicitness players completed at twice the rate of high implicitness players</div>
+      <div class="canvas-wrap" style="height:220px"><canvas id="ov_comp_impl"></canvas></div>
+      <div class="badges"><span class="badge marg">χ²=5.80, p=0.055 †</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Engagement &amp; enjoyment by adaptability</div>
+      <div class="cs">No-adaptability players scored consistently higher on every subjective measure</div>
+      <div class="canvas-wrap" style="height:220px"><canvas id="ov_subj_adapt"></canvas></div>
+      <div class="badges"><span class="badge sig">Engagement p=0.039 *</span><span class="badge marg">Enjoyment p=0.077 †</span><span class="badge sig">Scaffolding p=0.029 *</span></div>
+    </div>
+  </div>
+
+  <div class="footnote">* p &lt; 0.05 &nbsp; † p &lt; 0.10 &nbsp; ns = not significant &nbsp;·&nbsp; Stars = sum of Level 4–7 boolean columns (max=4) &nbsp;·&nbsp; Outliers removed via IQR × 1.5 per variable</div>
+</section>
+
+<!-- ═══════════════ SURVEY COMPOSITES ═══════════════ -->
+<section class="section" id="tab-survey">
+  <div class="section-header">
+    <h2>Survey composites</h2>
+    <p>Three composite measures (Likert 1–5) computed from the 10 survey items. No outliers were detected in any survey variable (N=90 for all).</p>
+  </div>
+
+  <div class="divider">By implicitness level</div>
+  <div class="legend">
+    <span><span class="sl" style="background:var(--blue)"></span>Low (n=25)</span>
+    <span><span class="sl" style="background:var(--teal)"></span>Moderate (n=37)</span>
+    <span><span class="sl" style="background:var(--coral)"></span>High (n=28)</span>
+  </div>
+  <div class="g3">
+    <div class="chart-card">
+      <div class="ct">Enjoyment composite</div>
+      <div class="cs">Enjoyed · Want to continue · Play again</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="s_enj_impl"></canvas></div>
+      <div class="badges"><span class="badge ns">ANOVA p=0.196 ns</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Engagement composite</div>
+      <div class="cs">Felt engaged · Paid attention</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="s_eng_impl"></canvas></div>
+      <div class="badges"><span class="badge ns">ANOVA p=0.134 ns</span><span class="badge sig">Low vs. high p=0.047 *</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Scaffolding composite</div>
+      <div class="cs">Easy to figure out · Challenge · Levels helped/prepared · Confident</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="s_scaf_impl"></canvas></div>
+      <div class="badges"><span class="badge ns">ANOVA p=0.216 ns</span><span class="badge marg">Low vs. high p=0.087 †</span></div>
+    </div>
+  </div>
+
+  <div class="divider">By adaptability condition</div>
+  <div class="legend">
+    <span><span class="sl" style="background:var(--purple)"></span>No adaptability (n=52)</span>
+    <span><span class="sl" style="background:var(--amber)"></span>With adaptability (n=38)</span>
+  </div>
+  <div class="g3">
+    <div class="chart-card">
+      <div class="ct">Enjoyment composite</div>
+      <div class="cs">No (3.54) · Yes (3.10)</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="s_enj_adapt"></canvas></div>
+      <div class="badges"><span class="badge marg">p=0.077 †</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Engagement composite</div>
+      <div class="cs">No (3.87) · Yes (3.41)</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="s_eng_adapt"></canvas></div>
+      <div class="badges"><span class="badge sig">p=0.039 *</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Scaffolding composite</div>
+      <div class="cs">No (3.85) · Yes (3.38)</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="s_scaf_adapt"></canvas></div>
+      <div class="badges"><span class="badge sig">p=0.029 *</span></div>
+    </div>
+  </div>
+  <div class="footnote">All Likert items rated 1–5. Composites are row-wise means across component items.</div>
+</section>
+
+<!-- ═══════════════ ALL 10 ITEMS ═══════════════ -->
+<section class="section" id="tab-items">
+  <div class="section-header">
+    <h2>All 10 survey items</h2>
+    <p>Individual item means (Likert 1–5) across all conditions. Horizontal bar charts allow direct comparison of every item simultaneously.</p>
+  </div>
+
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">All items by implicitness</div>
+      <div class="cs">Low consistently scores highest; high consistently lowest on nearly every item</div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--blue)"></span>Low</span>
+        <span><span class="sw" style="background:var(--teal)"></span>Moderate</span>
+        <span><span class="sw" style="background:var(--coral)"></span>High</span>
+      </div>
+      <div class="canvas-wrap" style="height:400px"><canvas id="items_impl"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">All items by adaptability</div>
+      <div class="cs">No-adaptability scores higher on every single item without exception</div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--purple)"></span>No adaptability</span>
+        <span><span class="sw" style="background:var(--amber)"></span>With adaptability</span>
+      </div>
+      <div class="canvas-wrap" style="height:400px"><canvas id="items_adapt"></canvas></div>
+    </div>
+  </div>
+  <div class="footnote">Items 1–5 form Enjoyment/Engagement composites. Items 6–10 form the Scaffolding composite.</div>
+</section>
+
+<!-- ═══════════════ PERFORMANCE ═══════════════ -->
+<section class="section" id="tab-performance">
+  <div class="section-header">
+    <h2>Performance metrics</h2>
+    <p>Stars (corrected), deaths, total time, and button presses per second — before and after outlier removal where applicable.</p>
+  </div>
+
+  <div class="divider">Stars earned (corrected: sum of L4–L7 boolean columns, max = 4 · no outliers)</div>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--blue)"></span>Low</span>
+    <span><span class="sw" style="background:var(--teal)"></span>Moderate</span>
+    <span><span class="sw" style="background:var(--coral)"></span>High</span>
+    <span><span class="sw" style="background:var(--purple)"></span>No adapt.</span>
+    <span><span class="sw" style="background:var(--amber)"></span>With adapt.</span>
+  </div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Stars by implicitness (N=84)</div>
+      <div class="cs">Low (0.88) · Moderate (1.30) · High (1.14)</div>
+      <div class="canvas-wrap" style="height:190px"><canvas id="p_stars_impl"></canvas></div>
+      <div class="badges"><span class="badge ns">ANOVA p=0.292 ns</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Stars by adaptability (N=84)</div>
+      <div class="cs">No (1.27) · Yes (0.95)</div>
+      <div class="canvas-wrap" style="height:190px"><canvas id="p_stars_adapt"></canvas></div>
+      <div class="badges"><span class="badge ns">p=0.576 ns</span></div>
+    </div>
+  </div>
+
+  <div class="divider">Total deaths — before (N=90) vs. after outlier removal (N=83, 7 removed)</div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Deaths by implicitness — before / after</div>
+      <div class="cs">Moderate's apparent high-death pattern collapses entirely after outlier removal</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="p_deaths_impl"></canvas></div>
+      <div class="badges"><span class="badge ns">Before: p=0.119 ns</span><span class="badge ns">After: p=0.610 ns</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Deaths by adaptability — before / after</div>
+      <div class="cs">No (11.3→6.9) · Yes (10.5→8.6) — direction reverses after cleaning</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="p_deaths_adapt"></canvas></div>
+      <div class="badges"><span class="badge ns">Before: p=0.792 ns</span><span class="badge ns">After: p=0.371 ns</span></div>
+    </div>
+  </div>
+
+  <div class="divider">Total time (seconds) — before (N=90) vs. after outlier removal (N=83, 7 removed)</div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Time by implicitness — before / after</div>
+      <div class="cs">Extreme outliers inflated means by 200–300s; gap narrows substantially after cleaning</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="p_time_impl"></canvas></div>
+      <div class="badges"><span class="badge ns">Before: p=0.512 ns</span><span class="badge ns">After: p=0.373 ns</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Time by adaptability — before / after</div>
+      <div class="cs">No (418→248s) · Yes (509→224s)</div>
+      <div class="canvas-wrap" style="height:200px"><canvas id="p_time_adapt"></canvas></div>
+      <div class="badges"><span class="badge ns">Before: p=0.721 ns</span><span class="badge ns">After: p=0.501 ns</span></div>
+    </div>
+  </div>
+
+  <div class="divider">Average button presses per second — before (N=90) vs. after (N=87, 3 removed)</div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">BPS by implicitness — before / after</div>
+      <div class="cs">Near-identical across all groups; no meaningful variation</div>
+      <div class="canvas-wrap" style="height:190px"><canvas id="p_bps_impl"></canvas></div>
+      <div class="badges"><span class="badge ns">Before: p=0.899 ns</span><span class="badge ns">After: p=0.976 ns</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">BPS by adaptability — before / after</div>
+      <div class="cs">No (1.86→1.81) · Yes (1.81→1.69)</div>
+      <div class="canvas-wrap" style="height:190px"><canvas id="p_bps_adapt"></canvas></div>
+      <div class="badges"><span class="badge ns">Before: p=0.793 ns</span><span class="badge ns">After: p=0.468 ns</span></div>
+    </div>
+  </div>
+  <div class="footnote">Before/after comparisons use darker bars for raw data, lighter bars for cleaned data. Stars: 6 outliers removed (N→84).</div>
+</section>
+
+<!-- ═══════════════ PER-LEVEL ═══════════════ -->
+<section class="section" id="tab-levels">
+  <div class="section-header">
+    <h2>Per-level analysis</h2>
+    <p>Time and button presses broken down by level. Outliers removed independently per level. N shrinks at later levels as fewer players reached them.</p>
+  </div>
+
+  <div class="divider">Time per level (seconds · cleaned per level)</div>
+  <div class="legend">
+    <span><span class="sl" style="background:var(--blue)"></span>Low</span>
+    <span><span class="sl" style="background:var(--teal)"></span>Moderate</span>
+    <span><span class="sl" style="background:var(--coral)"></span>High</span>
+    <span><span class="sl" style="background:var(--purple)"></span>No adapt.</span>
+    <span><span class="sl" style="background:var(--amber)"></span>With adapt.</span>
+  </div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Time per level by implicitness</div>
+      <div class="cs">Low implicitness spends more time at L2; L6–L7 differences are non-significant after cleaning</div>
+      <div class="canvas-wrap" style="height:250px"><canvas id="l_time_impl"></canvas></div>
+      <div class="badges"><span class="badge marg">L2 p=0.090 †</span><span class="badge ns">L6 p=0.205 ns</span><span class="badge ns">L7 p=0.998 ns</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Time per level by adaptability</div>
+      <div class="cs">Near-parallel lines — adaptability has no consistent time effect at any level</div>
+      <div class="canvas-wrap" style="height:250px"><canvas id="l_time_adapt"></canvas></div>
+      <div class="badges"><span class="badge ns">All levels ns</span></div>
+    </div>
+  </div>
+
+  <div class="divider">Total button presses per level (cleaned per level)</div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Button presses per level by implicitness</div>
+      <div class="cs">Groups track together through L5; low implicitness diverges sharply at L6–L7</div>
+      <div class="canvas-wrap" style="height:250px"><canvas id="l_bp_impl"></canvas></div>
+      <div class="badges"><span class="badge sig">L7: F=3.76, p=0.028 *</span><span class="badge sig">L7 low vs. high p=0.014 *</span><span class="badge sig">L7 low vs. mod p=0.049 *</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Button presses per level by adaptability</div>
+      <div class="cs">Nearly identical through L5; no-adaptability presses more at L6 (significant)</div>
+      <div class="canvas-wrap" style="height:250px"><canvas id="l_bp_adapt"></canvas></div>
+      <div class="badges"><span class="badge sig">L6: t=−2.07, p=0.041 *</span></div>
+    </div>
+  </div>
+
+  <div class="divider">BPS per level (button presses ÷ time · cleaned per level)</div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">BPS per level by implicitness</div>
+      <div class="cs">L1 dramatically lower (~0.2) as intro level; BPS stabilises from L2 onward</div>
+      <div class="canvas-wrap" style="height:250px"><canvas id="l_bps_impl"></canvas></div>
+      <div class="badges"><span class="badge marg">L3: F=2.70, p=0.074 †</span><span class="badge ns">All others ns</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">BPS per level by adaptability</div>
+      <div class="cs">Essentially no adaptability effect on input rate at any level</div>
+      <div class="canvas-wrap" style="height:250px"><canvas id="l_bps_adapt"></canvas></div>
+      <div class="badges"><span class="badge ns">All levels ns</span></div>
+    </div>
+  </div>
+
+  <div class="divider">Players with data per level</div>
+  <div class="chart-card">
+    <div class="ct">N per level</div>
+    <div class="cs">Attrition reflects players who did not reach or complete later levels</div>
+    <div class="canvas-wrap" style="height:180px"><canvas id="l_n_per_level"></canvas></div>
+  </div>
+
+  <div class="footnote">N per level: L1=90, L2=83, L3=80, L4=77, L5=72, L6=65, L7=44 (before per-level outlier removal).</div>
+</section>
+
+<!-- ═══════════════ COMPLETION ═══════════════ -->
+<section class="section" id="tab-completion">
+  <div class="section-header">
+    <h2>Game completion</h2>
+    <p>Whether players completed the game (yes/no) across conditions. Chi-square tests used for categorical outcome.</p>
+  </div>
+
+  <div class="metric-row">
+    <div class="metric-card"><div class="label">Overall completion</div><div class="value">46.7%</div><div class="sub">42 of 90</div></div>
+    <div class="metric-card"><div class="label">Low implicitness</div><div class="value">60.0%</div><div class="sub">15 of 25 — highest</div></div>
+    <div class="metric-card"><div class="label">High implicitness</div><div class="value">28.6%</div><div class="sub">8 of 28 — lowest</div></div>
+    <div class="metric-card"><div class="label">High impl. + adapt.</div><div class="value">16.7%</div><div class="sub">2 of 12 — worst subgroup</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Completion by implicitness (stacked %)</div>
+      <div class="cs">Low (60%) · Moderate (51%) · High (29%)</div>
+      <div class="canvas-wrap" style="height:230px"><canvas id="c_impl"></canvas></div>
+      <div class="badges"><span class="badge marg">χ²=5.80, p=0.055 †</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Completion by adaptability (stacked %)</div>
+      <div class="cs">No (52%) · Yes (40%)</div>
+      <div class="canvas-wrap" style="height:230px"><canvas id="c_adapt"></canvas></div>
+      <div class="badges"><span class="badge ns">χ²=0.91, p=0.339 ns</span></div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="ct">Completion rate — implicitness × adaptability interaction</div>
+    <div class="cs">Notable: adaptability helps slightly at low implicitness but severely hurts at high implicitness (16.7%)</div>
+    <div class="legend" style="margin-top:8px">
+      <span><span class="sw" style="background:var(--purple)"></span>No adaptability</span>
+      <span><span class="sw" style="background:var(--amber)"></span>With adaptability</span>
+    </div>
+    <div class="canvas-wrap" style="height:240px"><canvas id="c_interact"></canvas></div>
+  </div>
+  <div class="footnote">Chi-square test for independence used. Subgroup Ns: High/No=16, High/Yes=12, Low/No=16, Low/Yes=9, Moderate/No=20, Moderate/Yes=17.</div>
+</section>
+
+<!-- ═══════════════ INTERACTION ═══════════════ -->
+<section class="section" id="tab-interaction">
+  <div class="section-header">
+    <h2>Two-way ANOVA interactions</h2>
+    <p>Interaction terms (Implicitness × Adaptability) for all metrics. Only enjoyment showed a marginally significant interaction. Parallel lines = additive effects; crossing lines = interaction.</p>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:16px">
+    <div class="ct">Two-way ANOVA summary — all metrics</div>
+    <div class="cs">Main effects and interaction F-statistics with significance flags</div>
+    <table class="sig-table">
+      <thead><tr><th>Metric</th><th>N</th><th>Implicitness (main)</th><th>Adaptability (main)</th><th>Interaction</th></tr></thead>
+      <tbody>
+        <tr><td>Enjoyment</td><td>90</td><td><span class="badge sig">F=4.46, p=0.014 *</span></td><td><span class="badge marg">F=3.478, p=0.066 †</span></td><td><span class="badge marg">F=2.855, p=0.063 †</span></td></tr>
+        <tr><td>Engagement</td><td>90</td><td><span class="badge ns">F=2.19, p=0.119 ns</span></td><td><span class="badge sig">F=4.430, p=0.038 *</span></td><td><span class="badge ns">F=0.815, p=0.446 ns</span></td></tr>
+        <tr><td>Scaffolding</td><td>90</td><td><span class="badge ns">F=0.85, p=0.432 ns</span></td><td><span class="badge sig">F=4.646, p=0.034 *</span></td><td><span class="badge ns">F=1.015, p=0.367 ns</span></td></tr>
+        <tr><td>Stars (corrected)</td><td>84</td><td><span class="badge ns">F=1.251, p=0.292 ns</span></td><td><span class="badge ns">F=0.575, p=0.451 ns</span></td><td><span class="badge ns">F=0.706, p=0.497 ns</span></td></tr>
+        <tr><td>Total deaths (cleaned)</td><td>83</td><td><span class="badge ns">F=0.72, p=0.488 ns</span></td><td><span class="badge ns">F=0.936, p=0.336 ns</span></td><td><span class="badge ns">F=0.493, p=0.613 ns</span></td></tr>
+        <tr><td>Total time (cleaned)</td><td>83</td><td><span class="badge ns">F=0.73, p=0.486 ns</span></td><td><span class="badge ns">F=0.320, p=0.573 ns</span></td><td><span class="badge ns">F=0.034, p=0.967 ns</span></td></tr>
+        <tr><td>BPS (cleaned)</td><td>87</td><td><span class="badge ns">F=0.34, p=0.713 ns</span></td><td><span class="badge ns">F=0.500, p=0.482 ns</span></td><td><span class="badge ns">F=0.680, p=0.510 ns</span></td></tr>
+        <tr><td>Completion</td><td>90</td><td><span class="badge ns">F=1.02, p=0.364 ns</span></td><td><span class="badge ns">F=1.244, p=0.268 ns</span></td><td><span class="badge ns">F=0.799, p=0.453 ns</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider">Enjoyment — the only marginal interaction (p=0.063†)</div>
+  <div class="legend">
+    <span><span class="sl" style="background:var(--purple)"></span>No adaptability</span>
+    <span><span class="sl" style="background:var(--amber)"></span>With adaptability</span>
+  </div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Enjoyment cell means (grouped bar)</div>
+      <div class="cs">High/no=2.85 · High/yes=3.25 · Low/no=3.75 · Low/yes=2.96 · Mod/no=3.92 · Mod/yes=3.06</div>
+      <div class="canvas-wrap" style="height:220px"><canvas id="int_enj_bar"></canvas></div>
+      <div class="badges"><span class="badge marg">Interaction p=0.063 †</span><span class="badge sig">Implicitness main p=0.014 *</span><span class="badge marg">Adaptability main p=0.066 †</span></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Enjoyment interaction plot (line)</div>
+      <div class="cs">Lines cross at high implicitness — disordinal interaction: adaptability reverses direction</div>
+      <div class="canvas-wrap" style="height:220px"><canvas id="int_enj_line"></canvas></div>
+    </div>
+  </div>
+
+  <div class="divider">All other metrics — cell means (no significant interactions)</div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Engagement cell means</div>
+      <div class="cs">No-adaptability higher across all groups — significant main effect (p=0.038*), no interaction (p=0.446 ns)</div>
+      <div class="canvas-wrap" style="height:190px"><canvas id="int_eng_line"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Scaffolding cell means</div>
+      <div class="cs">No-adaptability higher across all groups — significant main effect (p=0.034*), no interaction (p=0.367 ns)</div>
+      <div class="canvas-wrap" style="height:190px"><canvas id="int_scaf_line"></canvas></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="chart-card">
+      <div class="ct">Completion cell means</div>
+      <div class="cs">Some divergence at high implicitness; interaction p=0.453 ns</div>
+      <div class="canvas-wrap" style="height:190px"><canvas id="int_comp_line"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="ct">Stars earned cell means</div>
+      <div class="cs">No consistent pattern; interaction p=0.786 ns</div>
+      <div class="canvas-wrap" style="height:190px"><canvas id="int_stars_line"></canvas></div>
+    </div>
+  </div>
+
+  <div class="footnote">Two-way ANOVA via OLS dummy coding. Reference levels: low implicitness, no adaptability. Interaction term has 2 df.</div>
+</section>
+
+</main>
+
+<script>
+// ── Shared config ──
+const BL='#185FA5', TL='#1D9E75', CO='#D85A30', PU='#534AB7', AM='#BA7517';
+const BLA='rgba(24,95,165,0.38)', TLA='rgba(29,158,117,0.38)', COA='rgba(216,90,48,0.38)';
+const PUA='rgba(83,74,183,0.38)', AMA='rgba(186,117,23,0.38)';
+const GY='#B4B2A9', GYA='rgba(180,178,169,0.45)';
+const GR='rgba(136,135,128,0.15)', TS='#888780';
+const LVLS=['L1','L2','L3','L4','L5','L6','L7'];
+
+const baseOpts = (yMin, yMax, yLabel='') => ({
+  responsive:true, maintainAspectRatio:false,
+  plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' '+c.parsed.y.toFixed(2)+(yLabel?' '+yLabel:'')}}},
+  scales:{
+    x:{grid:{display:false}, ticks:{color:TS, font:{size:11}}},
+    y:{min:yMin, max:yMax, grid:{color:GR}, ticks:{color:TS, font:{size:11}}}
+  }
+});
+
+function bar(id, labels, datasets, yMin, yMax, yLabel='') {
+  new Chart(document.getElementById(id), {
+    type:'bar', data:{labels, datasets},
+    options:{...baseOpts(yMin,yMax,yLabel), scales:{
+      x:{grid:{display:false}, ticks:{color:TS, font:{size:11}}},
+      y:{min:yMin, max:yMax, grid:{color:GR}, ticks:{color:TS, font:{size:11}}}
+    }}
+  });
+}
+
+function line(id, labels, datasets, yMin, yMax, yLabel='') {
+  new Chart(document.getElementById(id), {
+    type:'line', data:{labels, datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(2)+(yLabel?' '+yLabel:'')}}},
+      elements:{point:{radius:4, hoverRadius:6}, line:{tension:0.2}},
+      scales:{
+        x:{grid:{display:false}, ticks:{color:TS, font:{size:11}}},
+        y:{min:yMin, max:yMax, grid:{color:GR}, ticks:{color:TS, font:{size:11}}}
+      }
+    }
+  });
+}
+
+function ds(label, data, color, alpha) {
+  return {label, data, backgroundColor: alpha ? color+'55' : color, borderColor:color, borderRadius:4, maxBarThickness:48, fill:false, pointBackgroundColor:color};
+}
+
+// ── Tab navigation ──
+document.getElementById('nav').addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('tab-'+e.target.dataset.tab).classList.add('active');
+});
+
+// ══════════ OVERVIEW ══════════
+bar('ov_comp_impl',['Low','Moderate','High'],[{data:[60,51.4,28.6], backgroundColor:[BL,TL,CO], borderRadius:5, maxBarThickness:55}],0,80,'%');
+bar('ov_subj_adapt',['Enjoyment','Engagement','Scaffolding'],[
+  ds('No adapt.',[3.54,3.87,3.85],PU), ds('With adapt.',[3.10,3.41,3.38],AM)
+],2.0,4.5);
+
+// ══════════ SURVEY COMPOSITES ══════════
+bar('s_enj_impl',['Low','Moderate','High'],[{data:[3.467,3.523,3.024],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:55}],2.0,4.5);
+bar('s_eng_impl',['Low','Moderate','High'],[{data:[3.920,3.730,3.375],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:55}],2.0,4.5);
+bar('s_scaf_impl',['Low','Moderate','High'],[{data:[3.928,3.605,3.464],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:55}],2.0,4.5);
+bar('s_enj_adapt',['No adaptability','With adaptability'],[{data:[3.538,3.096],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:65}],2.0,4.5);
+bar('s_eng_adapt',['No adaptability','With adaptability'],[{data:[3.865,3.408],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:65}],2.0,4.5);
+bar('s_scaf_adapt',['No adaptability','With adaptability'],[{data:[3.846,3.384],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:65}],2.0,4.5);
+
+// ══════════ ALL 10 ITEMS ══════════
+const itemLabels=['Felt engaged','Want to continue','Paid attention','Enjoyed','Play again','Easy to figure out','Appropriate challenge','Levels helped','Levels prepared','Felt confident'];
+new Chart(document.getElementById('items_impl'),{type:'bar',data:{labels:itemLabels,datasets:[
+  {label:'Low',data:[4.08,3.28,3.76,3.92,3.20,3.92,3.76,4.12,4.20,3.64],backgroundColor:BL,borderRadius:3,maxBarThickness:16},
+  {label:'Moderate',data:[3.919,3.514,3.541,3.703,3.351,3.351,3.351,3.919,3.730,3.676],backgroundColor:TL,borderRadius:3,maxBarThickness:16},
+  {label:'High',data:[3.536,2.786,3.214,3.321,2.964,3.286,3.321,3.786,3.679,3.250],backgroundColor:CO,borderRadius:3,maxBarThickness:16}
+]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.label+': '+c.parsed.x.toFixed(2)}}},scales:{x:{min:1,max:5,grid:{color:GR},ticks:{color:TS,font:{size:11}}},y:{grid:{display:false},ticks:{color:TS,font:{size:10}}}}}});
+new Chart(document.getElementById('items_adapt'),{type:'bar',data:{labels:itemLabels,datasets:[
+  {label:'No adaptability',data:[4.019,3.423,3.712,3.808,3.385,3.615,3.750,4.077,4.058,3.731],backgroundColor:PU,borderRadius:3,maxBarThickness:20},
+  {label:'With adaptability',data:[3.605,2.947,3.211,3.421,2.921,3.316,3.053,3.737,3.553,3.263],backgroundColor:AM,borderRadius:3,maxBarThickness:20}
+]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.label+': '+c.parsed.x.toFixed(2)}}},scales:{x:{min:1,max:5,grid:{color:GR},ticks:{color:TS,font:{size:11}}},y:{grid:{display:false},ticks:{color:TS,font:{size:10}}}}}});
+
+// ══════════ PERFORMANCE ══════════
+bar('p_stars_impl',['Low','Moderate','High'],[{data:[0.880,1.297,1.143],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:55}],0,2.0);
+bar('p_stars_adapt',['No adaptability','With adaptability'],[{data:[1.269,0.947],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:65}],0,2.0);
+
+new Chart(document.getElementById('p_deaths_impl'),{type:'bar',data:{labels:['Low','Moderate','High'],datasets:[
+  {label:'Before (N=90)',data:[10.28,14.46,7.07],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:26},
+  {label:'After (N=83)',data:[9.04,7.07,7.07],backgroundColor:[BLA,TLA,COA],borderRadius:4,maxBarThickness:26}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}}},y:{min:0,max:18,grid:{color:GR},ticks:{color:TS,font:{size:11}}}}}});
+
+new Chart(document.getElementById('p_deaths_adapt'),{type:'bar',data:{labels:['No adaptability','With adaptability'],datasets:[
+  {label:'Before',data:[11.35,10.53],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:30},
+  {label:'After', data:[6.94,8.56], backgroundColor:[PUA,AMA],borderRadius:4,maxBarThickness:30}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}}},y:{min:0,max:16,grid:{color:GR},ticks:{color:TS,font:{size:11}}}}}});
+
+new Chart(document.getElementById('p_time_impl'),{type:'bar',data:{labels:['Low','Moderate','High'],datasets:[
+  {label:'Before',data:[518,577,242],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:26},
+  {label:'After', data:[278,231,213],backgroundColor:[BLA,TLA,COA],borderRadius:4,maxBarThickness:26}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}}},y:{min:0,max:700,grid:{color:GR},ticks:{color:TS,font:{size:11}}}}}});
+
+new Chart(document.getElementById('p_time_adapt'),{type:'bar',data:{labels:['No adaptability','With adaptability'],datasets:[
+  {label:'Before',data:[418,509],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:30},
+  {label:'After', data:[248,224],backgroundColor:[PUA,AMA],borderRadius:4,maxBarThickness:30}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}}},y:{min:0,max:700,grid:{color:GR},ticks:{color:TS,font:{size:11}}}}}});
+
+new Chart(document.getElementById('p_bps_impl'),{type:'bar',data:{labels:['Low','Moderate','High'],datasets:[
+  {label:'Before',data:[1.769,1.867,1.871],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:26},
+  {label:'After', data:[1.769,1.738,1.783],backgroundColor:[BLA,TLA,COA],borderRadius:4,maxBarThickness:26}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}}},y:{min:1.4,max:2.2,grid:{color:GR},ticks:{color:TS,font:{size:11}}}}}});
+
+new Chart(document.getElementById('p_bps_adapt'),{type:'bar',data:{labels:['No adaptability','With adaptability'],datasets:[
+  {label:'Before',data:[1.863,1.811],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:30},
+  {label:'After', data:[1.814,1.685],backgroundColor:[PUA,AMA],borderRadius:4,maxBarThickness:30}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}}},y:{min:1.4,max:2.2,grid:{color:GR},ticks:{color:TS,font:{size:11}}}}}});
+
+// ══════════ PER-LEVEL ══════════
+line('l_time_impl',LVLS,[
+  {label:'Low',data:[38.72,6.85,5.13,29.28,20.90,51.82,96.25],borderColor:BL,pointBackgroundColor:BL,fill:false},
+  {label:'Moderate',data:[37.95,7.47,5.03,23.47,19.41,28.88,49.53],borderColor:TL,pointBackgroundColor:TL,fill:false},
+  {label:'High',data:[43.22,10.39,5.64,27.23,16.94,32.63,37.23],borderColor:CO,pointBackgroundColor:CO,fill:false}
+],0,120,'s');
+line('l_time_adapt',LVLS,[
+  {label:'No adapt.',data:[40.30,8.00,5.18,27.00,18.88,42.19,51.66],borderColor:PU,pointBackgroundColor:PU,fill:false},
+  {label:'With adapt.',data:[39.29,8.40,5.29,25.40,19.30,29.22,66.13],borderColor:AM,pointBackgroundColor:AM,fill:false}
+],0,120,'s');
+
+line('l_bp_impl',LVLS,[
+  {label:'Low',data:[6.83,19.28,9.83,110.46,44.54,125.04,245.04],borderColor:BL,pointBackgroundColor:BL,fill:false},
+  {label:'Moderate',data:[7.06,21.49,8.97,83.87,35.03,80.00,129.30],borderColor:TL,pointBackgroundColor:TL,fill:false},
+  {label:'High',data:[8.41,26.54,9.56,79.23,35.37,84.78,87.23],borderColor:CO,pointBackgroundColor:CO,fill:false}
+],0,280);
+line('l_bp_adapt',LVLS,[
+  {label:'No adapt.',data:[7.27,22.24,8.94,90.71,39.20,111.59,142.07],borderColor:PU,pointBackgroundColor:PU,fill:false},
+  {label:'With adapt.',data:[7.50,22.29,9.97,89.56,35.74,70.38,156.16],borderColor:AM,pointBackgroundColor:AM,fill:false}
+],0,280);
+
+line('l_bps_impl',LVLS,[
+  {label:'Low',data:[0.180,2.645,1.759,3.503,1.969,2.319,2.599],borderColor:BL,pointBackgroundColor:BL,fill:false},
+  {label:'Moderate',data:[0.186,2.739,1.868,3.371,2.021,2.628,2.584],borderColor:TL,pointBackgroundColor:TL,fill:false},
+  {label:'High',data:[0.244,2.753,2.209,3.049,1.920,2.450,2.554],borderColor:CO,pointBackgroundColor:CO,fill:false}
+],0,4.5,'BPS');
+line('l_bps_adapt',LVLS,[
+  {label:'No adapt.',data:[0.192,2.639,1.899,3.443,1.968,2.440,2.674],borderColor:PU,pointBackgroundColor:PU,fill:false},
+  {label:'With adapt.',data:[0.212,2.824,1.989,3.154,1.988,2.560,2.427],borderColor:AM,pointBackgroundColor:AM,fill:false}
+],0,4.5,'BPS');
+
+new Chart(document.getElementById('l_n_per_level'),{type:'bar',data:{labels:LVLS,datasets:[{label:'N',data:[90,83,80,77,72,65,44],backgroundColor:BL,borderRadius:4,maxBarThickness:36}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' N = '+c.parsed.y+' players'}}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}}},y:{min:0,max:95,grid:{color:GR},ticks:{color:TS,font:{size:11}}}}}});
+
+// ══════════ COMPLETION ══════════
+new Chart(document.getElementById('c_impl'),{type:'bar',data:{labels:['Low','Moderate','High'],datasets:[
+  {label:'Completed',data:[60,51.4,28.6],backgroundColor:BL,borderRadius:4,maxBarThickness:55},
+  {label:'Did not',data:[40,48.6,71.4],backgroundColor:GY,borderRadius:4,maxBarThickness:55}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}},stacked:true},y:{grid:{color:GR},ticks:{color:TS,font:{size:11},callback:v=>v+'%'},stacked:true,max:100}}}});
+new Chart(document.getElementById('c_adapt'),{type:'bar',data:{labels:['No adaptability','With adaptability'],datasets:[
+  {label:'Completed',data:[51.9,39.5],backgroundColor:PU,borderRadius:4,maxBarThickness:65},
+  {label:'Did not',data:[48.1,60.5],backgroundColor:GY,borderRadius:4,maxBarThickness:65}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}},stacked:true},y:{grid:{color:GR},ticks:{color:TS,font:{size:11},callback:v=>v+'%'},stacked:true,max:100}}}});
+bar('c_interact',['Low implicitness','Moderate implicitness','High implicitness'],[
+  ds('No adapt.',[56.2,60.0,37.5],PU), ds('With adapt.',[66.7,41.2,16.7],AM)
+],0,80,'%');
+
+// ══════════ INTERACTION ══════════
+new Chart(document.getElementById('int_enj_bar'),{type:'bar',data:{labels:['Low','Moderate','High'],datasets:[
+  ds('No adapt.',[3.750,3.917,2.854],PU), ds('With adapt.',[2.963,3.059,3.250],AM)
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}}},y:{min:2.0,max:4.5,grid:{color:GR},ticks:{color:TS,font:{size:11}}}}}});
+
+const IMPL_LABELS=['Low','Moderate','High'];
+line('int_enj_line',IMPL_LABELS,[
+  {label:'No adapt.',data:[3.750,3.917,2.854],borderColor:PU,pointBackgroundColor:PU,fill:false},
+  {label:'With adapt.',data:[2.963,3.059,3.250],borderColor:AM,pointBackgroundColor:AM,fill:false}
+],2.0,4.5);
+line('int_eng_line',IMPL_LABELS,[
+  {label:'No adapt.',data:[4.031,4.075,3.438],borderColor:PU,pointBackgroundColor:PU,fill:false},
+  {label:'With adapt.',data:[3.722,3.324,3.292],borderColor:AM,pointBackgroundColor:AM,fill:false}
+],2.5,4.5);
+line('int_scaf_line',IMPL_LABELS,[
+  {label:'No adapt.',data:[3.962,3.960,3.588],borderColor:PU,pointBackgroundColor:PU,fill:false},
+  {label:'With adapt.',data:[3.867,3.188,3.300],borderColor:AM,pointBackgroundColor:AM,fill:false}
+],2.5,4.5);
+line('int_comp_line',IMPL_LABELS,[
+  {label:'No adapt.',data:[0.562,0.600,0.375],borderColor:PU,pointBackgroundColor:PU,fill:false},
+  {label:'With adapt.',data:[0.667,0.412,0.167],borderColor:AM,pointBackgroundColor:AM,fill:false}
+],0,0.8);
+line('int_stars_line',IMPL_LABELS,[
+  {label:'No adapt.',data:[0.938,1.450,1.375],borderColor:PU,pointBackgroundColor:PU,fill:false},
+  {label:'With adapt.',data:[0.778,1.118,0.833],borderColor:AM,pointBackgroundColor:AM,fill:false}
+],0,2.0);
+</script>
+</body>
+</html>
