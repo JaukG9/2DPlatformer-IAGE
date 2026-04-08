@@ -156,7 +156,7 @@ The CSV merges the survey form responses with the auto-logged gameplay telemetry
 ---
 
 ## Access GitHub Pages
-> Access the [game here](https://jaukg9.github.io/2DPlatformer-IAGE/Game)
+> Access the [game here](https://jaukg9.github.io/2DPlatformer-IAGE/Game)<br>
 > Access the [research dashboard here](https://jaukg9.github.io/2DPlatformer-IAGE/research_dashboard.html)
 
 ---
