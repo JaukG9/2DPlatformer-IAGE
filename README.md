@@ -159,6 +159,31 @@ The CSV merges the survey form responses with the auto-logged gameplay telemetry
 
 ---
 
+## File Structure:
+```plaintext
+2DPlatformer-IAGE/
+│
+├── Data_Analysis/
+│   ├── analysis_results.pdf
+│   ├── analysis_summary.csv
+│   └── data_analysis.R
+|
+├── Data_Processing/
+│   ├── Combined_Data.csv
+│   ├── CSVProcessor.java
+│   ├── IAGEData.csv
+│   ├── Processed_IAGEData.csv
+│   └── surveyResponses.csv
+│
+└── Game/
+    ├── images/BGs      # IMAGE FILES
+    ├── index.html
+    ├── style.css
+    └── script.js
+```
+
+---
+
 ## Citation
 
 If referencing this work, please cite accordingly based on the final report associated with this study.
