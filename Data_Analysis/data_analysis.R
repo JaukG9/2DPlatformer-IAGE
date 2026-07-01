@@ -204,8 +204,43 @@ sig_sub <- function(sig) {
          "")
 }
 
+# Shared dashboard-style theme (serif type, soft gridlines, tight margins)
+theme_dashboard <- function(base_size = 10) {
+  theme_minimal(base_size = base_size, base_family = "serif") +
+    theme(
+      plot.background     = element_rect(fill = "#ffffff", color = NA),
+      panel.background    = element_rect(fill = "#ffffff", color = NA),
+      plot.title          = element_text(size = base_size + 1, face = "plain", color = "#1a1a18"),
+      axis.title          = element_text(size = base_size - 1.5, color = "#5f5e5a"),
+      axis.text           = element_text(size = base_size - 1.5, color = "#888780"),
+      panel.grid.major.y  = element_line(color = "#e8e6df", linewidth = 0.4),
+      panel.grid.major.x  = element_blank(),
+      panel.grid.minor    = element_blank(),
+      legend.text         = element_text(size = base_size - 1.5, color = "#5f5e5a"),
+      legend.title         = element_blank(),
+      plot.margin         = margin(10, 14, 14, 10)
+    )
+}
+
+# Badge-style significance colors (mirrors dashboard's sig/marg/ns pill colors)
+sig_badge_col <- function(sig) {
+  switch(sig, "*" = "#27500A", "\u2020" = "#633806", "ns" = "#444441", "#444441")
+}
+sig_badge_bg <- function(sig) {
+  switch(sig, "*" = "#eaf3de", "\u2020" = "#faeeda", "ns" = "#f1efe8", "#f1efe8")
+}
+
+# Rounded, colored significance badge drawn in the top-left of the panel
+sig_badge_layer <- function(sig, label_text = NULL) {
+  txt <- if (is.null(label_text)) sig_sub(sig) else label_text
+  annotate("label", x = -Inf, y = Inf, hjust = -0.06, vjust = 1.6,
+           label = txt, fill = sig_badge_bg(sig), color = sig_badge_col(sig),
+           label.size = 0, family = "mono", size = 2.6,
+           label.r = unit(0.2, "lines"), label.padding = unit(0.25, "lines"))
+}
+
 pg_title <- function(txt) {
-  textGrob(txt, gp = gpar(fontsize = 13, fontface = "bold"))
+  textGrob(txt, gp = gpar(fontsize = 13, fontface = "bold", fontfamily = "serif"))
 }
 
 # Bar graph
@@ -217,18 +252,13 @@ bar_plot <- function(y, group, colors, title, ylab,
     summarise(mn = mean(y), s = se(y), .groups = "drop")
 
   p <- ggplot(stats, aes(x = group, y = mn, fill = group)) +
-    geom_col(width = 0.55, color = NA) +
+    geom_col(width = 0.6, color = NA) +
     geom_errorbar(aes(ymin = mn - s, ymax = mn + s),
-                  width = 0.2, color = "#333333", linewidth = 0.6) +
+                  width = 0.15, color = "#5f5e5a", linewidth = 0.5) +
     scale_fill_manual(values = colors, guide = "none") +
-    labs(title = title, subtitle = sig_sub(sig), y = ylab, x = NULL) +
-    theme_minimal(base_size = 10) +
-    theme(
-      plot.title    = element_text(size = 10, face = "plain"),
-      plot.subtitle = element_text(size = 8, color = "#888888"),
-      panel.grid.major.x = element_blank(),
-      panel.grid.minor   = element_blank()
-    )
+    labs(title = title, y = ylab, x = NULL) +
+    theme_dashboard() +
+    sig_badge_layer(sig)
   if (!is.na(ylo)) p <- p + coord_cartesian(ylim = c(ylo, yhi))
   p
 }
@@ -246,20 +276,17 @@ comp_bar <- function(completed, group, title, sig = "ns") {
       levels = c("Not completed", "Completed")))
 
   ggplot(ct, aes(x = group, y = val, fill = status)) +
-    geom_col(width = 0.55) +
+    geom_col(width = 0.6) +
     scale_fill_manual(
-      values = c("Completed" = "#185FA5", "Not completed" = "#CCCCCC")) +
-    labs(title = title, subtitle = sig_sub(sig),
+      values = c("Completed" = "#185FA5", "Not completed" = "#B4B2A9")) +
+    labs(title = title,
          y = "Percentage (%)", x = NULL, fill = NULL) +
-    theme_minimal(base_size = 10) +
+    theme_dashboard() +
     theme(
-      plot.title    = element_text(size = 10, face = "plain"),
-      plot.subtitle = element_text(size = 8,  color = "#888888"),
-      panel.grid.major.x = element_blank(),
-      panel.grid.minor   = element_blank(),
       legend.position    = "bottom",
       legend.key.size    = unit(0.35, "cm")
-    )
+    ) +
+    sig_badge_layer(sig)
 }
 
 # Interaction line graph
@@ -278,17 +305,13 @@ int_plot <- function(y, impl, adapt, title, ylab,
     geom_errorbar(aes(ymin = mn - s, ymax = mn + s),
                   width = 0.12, linewidth = 0.5) +
     scale_color_manual(values = COL2, name = "Adaptability") +
-    labs(title    = title,
-         subtitle = paste0("Interaction: ", sig_sub(sig_int)),
-         y = ylab, x = "Implicitness") +
-    theme_minimal(base_size = 10) +
+    labs(title = title, y = ylab, x = "Implicitness") +
+    theme_dashboard() +
     theme(
-      plot.title    = element_text(size = 10),
-      plot.subtitle = element_text(size = 8, color = "#888888"),
-      panel.grid.minor = element_blank(),
       legend.position  = "bottom",
       legend.key.size  = unit(0.35, "cm")
-    )
+    ) +
+    sig_badge_layer(sig_int, label_text = paste0("Interaction: ", sig_sub(sig_int)))
   if (!is.na(ylo)) p <- p + coord_cartesian(ylim = c(ylo, yhi))
   p
 }

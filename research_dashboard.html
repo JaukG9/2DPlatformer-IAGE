@@ -1,712 +1,686 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gamified Education Research Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-  :root {
-    --blue:#185FA5; --teal:#1D9E75; --coral:#D85A30;
-    --purple:#534AB7; --amber:#BA7517;
-    --blue-l:rgba(24,95,165,0.38); --teal-l:rgba(29,158,117,0.38); --coral-l:rgba(216,90,48,0.38);
-    --purple-l:rgba(83,74,183,0.38); --amber-l:rgba(186,117,23,0.38);
-    --gray:#B4B2A9; --bg:#ffffff; --bg2:#f8f7f4; --bg3:#f1efe8;
-    --text:#1a1a18; --text2:#5f5e5a; --text3:#888780;
-    --border:rgba(136,135,128,0.2); --grid:rgba(136,135,128,0.15);
-    --radius:10px; --radius-sm:6px;
-    --sig:#eaf3de; --sig-t:#27500A; --marg:#faeeda; --marg-t:#633806; --ns:#f1efe8; --ns-t:#444441;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Georgia',serif;background:var(--bg2);color:var(--text);min-height:100vh}
-  header{background:var(--bg);border-bottom:1px solid var(--border);padding:2rem 2.5rem 1.5rem;position:sticky;top:0;z-index:100}
-  header h1{font-size:1.4rem;font-weight:normal;letter-spacing:-0.01em}
-  header p{font-size:0.8rem;color:var(--text3);margin-top:4px;font-family:'Courier New',monospace}
-  nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2.5rem;display:flex;overflow-x:auto}
-  nav button{background:none;border:none;cursor:pointer;font-family:'Georgia',serif;font-size:0.8rem;color:var(--text3);padding:0.75rem 1.1rem;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.15s}
-  nav button:hover{color:var(--text)}
-  nav button.active{color:var(--text);border-bottom-color:var(--blue)}
-  main{max-width:1280px;margin:0 auto;padding:2rem 2rem 4rem}
-  .section{display:none}
-  .section.active{display:block}
-  .sh{margin-bottom:1.5rem}
-  .sh h2{font-size:1.1rem;font-weight:normal}
-  .sh p{font-size:0.8rem;color:var(--text3);margin-top:4px;line-height:1.6}
-  .mr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.5rem}
-  .mc{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.9rem 1rem}
-  .mc .lbl{font-size:0.7rem;color:var(--text3);font-family:'Courier New',monospace;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px}
-  .mc .val{font-size:1.6rem;font-weight:normal;color:var(--text);line-height:1}
-  .mc .sub{font-size:0.7rem;color:var(--text3);margin-top:4px}
-  .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:16px}
-  .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:16px}
-  .cc{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
-  .cc .ct{font-size:0.85rem;font-weight:normal;color:var(--text);margin-bottom:2px}
-  .cc .cs{font-size:0.72rem;color:var(--text3);margin-bottom:12px;line-height:1.5}
-  .cw{position:relative;width:100%}
-  .lg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:0.72rem;color:var(--text2)}
-  .lg span{display:flex;align-items:center;gap:5px}
-  .sw{width:10px;height:10px;border-radius:2px;display:inline-block}
-  .sl{width:18px;height:3px;border-radius:2px;display:inline-block}
-  .bd{margin-top:10px;display:flex;flex-wrap:wrap;gap:4px}
-  .b{display:inline-block;font-size:0.68rem;padding:2px 7px;border-radius:3px;font-family:'Courier New',monospace}
-  .b.sig{background:var(--sig);color:var(--sig-t)}
-  .b.marg{background:var(--marg);color:var(--marg-t)}
-  .b.ns{background:var(--ns);color:var(--ns-t)}
-  .dv{font-size:0.68rem;font-family:'Courier New',monospace;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:3px 10px;display:inline-block;margin-bottom:10px}
-  .st{width:100%;border-collapse:collapse;font-size:0.75rem;margin-top:8px}
-  .st th{text-align:left;font-weight:normal;font-size:0.68rem;color:var(--text3);font-family:'Courier New',monospace;text-transform:uppercase;letter-spacing:0.05em;padding:5px 8px;border-bottom:1px solid var(--border)}
-  .st td{padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
-  .st tr:last-child td{border-bottom:none}
-  .fn{font-size:0.68rem;color:var(--text3);margin-top:1rem;line-height:1.7;font-family:'Courier New',monospace;border-top:1px solid var(--border);padding-top:0.75rem}
-  @media(max-width:700px){.g2,.g3{grid-template-columns:1fr}.mr{grid-template-columns:repeat(2,1fr)}header,nav{padding-left:1rem;padding-right:1rem}main{padding:1rem 1rem 3rem}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamified Education Research Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </head>
 <body>
-<header>
-  <h1>Implicitness &amp; Adaptability in Gamified Education — Results Dashboard</h1>
-  <p>N = 90 participants · Ages 14–18 · High school · Conditions randomly assigned · Values from official analysis summary</p>
-</header>
-<nav id="nav">
-  <button class="active" data-tab="overview">Overview</button>
-  <button data-tab="survey">Survey composites</button>
-  <button data-tab="items">All 10 items</button>
-  <button data-tab="performance">Performance</button>
-  <button data-tab="levels">Per-level analysis</button>
-  <button data-tab="completion">Completion</button>
-  <button data-tab="interaction">Interactions</button>
-  <button data-tab="demographics">Demographics</button>
-</nav>
-<main>
+    <header>
+        <h1>Implicitness &amp; Adaptability in Gamified Education Results Dashboard</h1>
+        <p>90 participants, ages 14 to 18, all in high school. Conditions were assigned at random, and every figure here comes from the official analysis summary.</p>
+    </header>
 
-<!-- ══ OVERVIEW ══ -->
-<section class="section active" id="tab-overview">
-  <div class="sh"><h2>Study overview</h2><p>Summary of conditions, sample, and headline findings. All statistics from official analysis CSV.</p></div>
-  <div class="mr">
-    <div class="mc"><div class="lbl">Participants</div><div class="val">90</div><div class="sub">High school, ages 14–18</div></div>
-    <div class="mc"><div class="lbl">Implicitness groups</div><div class="val">3</div><div class="sub">Low (25) · Moderate (37) · High (28)</div></div>
-    <div class="mc"><div class="lbl">Adaptability groups</div><div class="val">2</div><div class="sub">No (52) · Yes (38)</div></div>
-    <div class="mc"><div class="lbl">Overall completion</div><div class="val">46.7%</div><div class="sub">42 of 90 players finished</div></div>
-  </div>
-  <div class="mr">
-    <div class="mc"><div class="lbl">Sig. findings (p&lt;.05)</div><div class="val">2</div><div class="sub">Engagement &amp; clarity (adaptability)</div></div>
-    <div class="mc"><div class="lbl">Marginal (p&lt;.10)</div><div class="val">3</div><div class="sub">Enjoyment adapt, completion impl, enjoyment interaction</div></div>
-    <div class="mc"><div class="lbl">Outliers removed</div><div class="val">7–6</div><div class="sub">Deaths/time (N→83); Stars (N→84); BPS (N→87)</div></div>
-    <div class="mc"><div class="lbl">Interaction sig.</div><div class="val">0</div><div class="sub">Enjoyment marginal p=0.063 †</div></div>
-  </div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Completion rate by implicitness</div>
-      <div class="cs">Low implicitness players completed at twice the rate of high implicitness players</div>
-      <div class="cw" style="height:220px"><canvas id="ov_comp"></canvas></div>
-      <div class="bd"><span class="b marg">χ²=5.796, p=0.055 †</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Survey composites by adaptability</div>
-      <div class="cs">No-adaptability players scored higher on every composite measure</div>
-      <div class="cw" style="height:220px"><canvas id="ov_adapt"></canvas></div>
-      <div class="bd"><span class="b sig">Engagement p=0.039 *</span><span class="b sig">Clarity p=0.029 *</span><span class="b marg">Enjoyment p=0.077 †</span></div>
-    </div>
-  </div>
-  <div class="fn">* p &lt; 0.05 &nbsp; † p &lt; 0.10 &nbsp; ns = not significant &nbsp;·&nbsp; Stars = sum of Level 4–7 boolean columns (max=4, N=84, 6 outliers removed) &nbsp;·&nbsp; Welch t-tests used for adaptability comparisons</div>
-</section>
+    <nav id="nav">
+        <button class="active" data-tab="overview">Overview</button>
+        <button data-tab="survey">Survey composites</button>
+        <button data-tab="items">All 10 items</button>
+        <button data-tab="performance">Performance</button>
+        <button data-tab="levels">Per-level analysis</button>
+        <button data-tab="completion">Completion</button>
+        <button data-tab="interaction">Interactions</button>
+        <button data-tab="demographics">Demographics</button>
+    </nav>
 
-<!-- ══ SURVEY COMPOSITES ══ -->
-<section class="section" id="tab-survey">
-  <div class="sh"><h2>Survey composites</h2><p>Three composite measures (Likert 1–5). No outliers detected in any survey variable (N=90 for all survey outcomes).</p></div>
-  <div class="dv">By implicitness level — one-way ANOVA</div>
-  <div class="lg">
-    <span><span class="sl" style="background:var(--blue)"></span>Low (n=25)</span>
-    <span><span class="sl" style="background:var(--teal)"></span>Moderate (n=37)</span>
-    <span><span class="sl" style="background:var(--coral)"></span>High (n=28)</span>
-  </div>
-  <div class="g3">
-    <div class="cc">
-      <div class="ct">Enjoyment composite</div>
-      <div class="cs">Enjoyed · Want to continue · Play again</div>
-      <div class="cw" style="height:200px"><canvas id="s_enj_i"></canvas></div>
-      <div class="bd"><span class="b ns">F(2,87)=1.663, p=0.196 ns</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Engagement composite</div>
-      <div class="cs">Felt engaged · Paid attention</div>
-      <div class="cw" style="height:200px"><canvas id="s_eng_i"></canvas></div>
-      <div class="bd"><span class="b ns">F(2,87)=2.055, p=0.134 ns</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Clarity composite</div>
-      <div class="cs">Easy to figure out · Challenge · Levels helped/prepared · Confident</div>
-      <div class="cw" style="height:200px"><canvas id="s_scaf_i"></canvas></div>
-      <div class="bd"><span class="b ns">F(2,87)=1.562, p=0.216 ns</span></div>
-    </div>
-  </div>
-  <div class="dv">By adaptability condition — Welch t-test</div>
-  <div class="lg">
-    <span><span class="sl" style="background:var(--purple)"></span>No adaptability (n=52)</span>
-    <span><span class="sl" style="background:var(--amber)"></span>With adaptability (n=38)</span>
-  </div>
-  <div class="g3">
-    <div class="cc">
-      <div class="ct">Enjoyment composite</div>
-      <div class="cs">No (3.54) · Yes (3.10)</div>
-      <div class="cw" style="height:200px"><canvas id="s_enj_a"></canvas></div>
-      <div class="bd"><span class="b marg">t(77.7)=1.792, p=0.077 †</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Engagement composite</div>
-      <div class="cs">No (3.87) · Yes (3.41)</div>
-      <div class="cw" style="height:200px"><canvas id="s_eng_a"></canvas></div>
-      <div class="bd"><span class="b sig">t(72.6)=2.107, p=0.039 *</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Clarity composite</div>
-      <div class="cs">No (3.85) · Yes (3.38)</div>
-      <div class="cw" style="height:200px"><canvas id="s_scaf_a"></canvas></div>
-      <div class="bd"><span class="b sig">t(75.3)=2.222, p=0.029 *</span></div>
-    </div>
-  </div>
-  <div class="fn">All Likert items rated 1–5. Composites are row-wise means. Welch t-tests do not assume equal variances.</div>
-</section>
+    <main>
 
-<!-- ══ ALL 10 ITEMS ══ -->
-<section class="section" id="tab-items">
-  <div class="sh"><h2>All 10 survey items</h2><p>Individual item means (Likert 1–5). Items 1–5 contribute to Enjoyment/Engagement composites; items 6–10 to the Clarity composite.</p></div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">All items by implicitness</div>
-      <div class="cs">Low consistently scores highest; high consistently lowest on nearly every item</div>
-      <div class="lg"><span><span class="sw" style="background:var(--blue)"></span>Low</span><span><span class="sw" style="background:var(--teal)"></span>Moderate</span><span><span class="sw" style="background:var(--coral)"></span>High</span></div>
-      <div class="cw" style="height:400px"><canvas id="items_i"></canvas></div>
-    </div>
-    <div class="cc">
-      <div class="ct">All items by adaptability</div>
-      <div class="cs">No-adaptability scores higher on every single item without exception</div>
-      <div class="lg"><span><span class="sw" style="background:var(--purple)"></span>No adaptability</span><span><span class="sw" style="background:var(--amber)"></span>With adaptability</span></div>
-      <div class="cw" style="height:400px"><canvas id="items_a"></canvas></div>
-    </div>
-  </div>
-</section>
+        <!-- Overview -->
+        <section class="section active" id="tab-overview">
+            <div class="sh">
+                <h2>Study overview</h2>
+                <p>A summary of the conditions, the sample, and what stood out most. All statistics below come from the official analysis CSV.</p>
+            </div>
+            <div class="mr">
+                <div class="mc">
+                    <div class="lbl">Participants</div>
+                    <div class="val">90</div>
+                    <div class="sub">High school, ages 14–18</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Implicitness groups</div>
+                    <div class="val">3</div>
+                    <div class="sub">Low (25) · Moderate (37) · High (28)</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Adaptability groups</div>
+                    <div class="val">2</div>
+                    <div class="sub">No (52) · Yes (38)</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Overall completion</div>
+                    <div class="val">46.7%</div>
+                    <div class="sub">42 of 90 players finished</div>
+                </div>
+            </div>
+            <div class="mr">
+                <div class="mc">
+                    <div class="lbl">Sig. findings (p&lt;.05)</div>
+                    <div class="val">2</div>
+                    <div class="sub">Engagement &amp; clarity (adaptability)</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Marginal (p&lt;.10)</div>
+                    <div class="val">3</div>
+                    <div class="sub">Enjoyment adapt, completion impl, enjoyment interaction</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Outliers removed</div>
+                    <div class="val">7–6</div>
+                    <div class="sub">Deaths/time (N→83); Stars (N→84); BPS (N→87)</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Interaction sig.</div>
+                    <div class="val">0</div>
+                    <div class="sub">Enjoyment marginal p=0.063 †</div>
+                </div>
+            </div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Completion rate by implicitness</div>
+                    <div class="cs">Players in the low-implicitness group finished at roughly twice the rate of those in the high-implicitness group.</div>
+                    <div class="cw" style="height: 220px"><canvas id="ov_comp"></canvas></div>
+                    <div class="bd"><span class="b marg" data-stat="1.1 Completion|Group">χ²=5.796, p=0.055 †</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Survey composites by adaptability</div>
+                    <div class="cs">Players without adaptive difficulty scored higher on every single composite measure.</div>
+                    <div class="cw" style="height: 220px"><canvas id="ov_adapt"></canvas></div>
+                    <div class="bd">
+                        <span class="b sig" data-stat="2.3 Engagement|Adaptability" data-prefix="Engagement ">Engagement p=0.039 *</span>
+                        <span class="b sig" data-stat="2.4 Scaffolding|Adaptability" data-prefix="Clarity ">Clarity p=0.029 *</span>
+                        <span class="b marg" data-stat="2.2 Enjoyment|Adaptability" data-prefix="Enjoyment ">Enjoyment p=0.077 †</span>
+                    </div>
+                </div>
+            </div>
+            <div class="fn">* p &lt; 0.05 &nbsp; † p &lt; 0.10 &nbsp; ns = not significant &nbsp;·&nbsp; Stars = sum of Level 4–7 boolean columns (max=4, N=84, 6 outliers removed) &nbsp;·&nbsp; Welch t-tests used for adaptability comparisons</div>
+        </section>
 
-<!-- ══ PERFORMANCE ══ -->
-<section class="section" id="tab-performance">
-  <div class="sh"><h2>Performance metrics</h2><p>Stars (corrected, N=84, 6 outliers removed), deaths, total time, and BPS — before and after outlier removal where applicable.</p></div>
+        <!-- Survey Composites -->
+        <section class="section" id="tab-survey">
+            <div class="sh">
+                <h2>Survey composites</h2>
+                <p>Three composite measures, each built from related Likert items rated 1 to 5. No outliers turned up in any of the survey variables, so N=90 throughout.</p>
+            </div>
+            <div class="dv">By implicitness level (one-way ANOVA)</div>
+            <div class="lg">
+                <span><span class="sl" style="background: var(--blue)"></span>Low (n=25)</span>
+                <span><span class="sl" style="background: var(--teal)"></span>Moderate (n=37)</span>
+                <span><span class="sl" style="background: var(--coral)"></span>High (n=28)</span>
+            </div>
+            <div class="g3">
+                <div class="cc">
+                    <div class="ct">Enjoyment composite</div>
+                    <div class="cs">Enjoyed · Want to continue · Play again</div>
+                    <div class="cw" style="height: 200px"><canvas id="s_enj_i"></canvas></div>
+                    <div class="bd"><span class="b ns" data-stat="1.2 Enjoyment|Implicitness">F(2,87)=1.663, p=0.196 ns</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Engagement composite</div>
+                    <div class="cs">Felt engaged · Paid attention</div>
+                    <div class="cw" style="height: 200px"><canvas id="s_eng_i"></canvas></div>
+                    <div class="bd"><span class="b ns" data-stat="1.3 Engagement|Implicitness">F(2,87)=2.055, p=0.134 ns</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Clarity composite</div>
+                    <div class="cs">Easy to figure out · Challenge · Levels helped/prepared · Confident</div>
+                    <div class="cw" style="height: 200px"><canvas id="s_scaf_i"></canvas></div>
+                    <div class="bd"><span class="b ns" data-stat="1.4 Scaffolding|Implicitness">F(2,87)=1.562, p=0.216 ns</span></div>
+                </div>
+            </div>
+            <div class="dv">By adaptability condition (Welch t-test)</div>
+            <div class="lg">
+                <span><span class="sl" style="background: var(--purple)"></span>No adaptability (n=52)</span>
+                <span><span class="sl" style="background: var(--amber)"></span>With adaptability (n=38)</span>
+            </div>
+            <div class="g3">
+                <div class="cc">
+                    <div class="ct">Enjoyment composite</div>
+                    <div class="cs">No (3.54) · Yes (3.10)</div>
+                    <div class="cw" style="height: 200px"><canvas id="s_enj_a"></canvas></div>
+                    <div class="bd"><span class="b marg" data-stat="2.2 Enjoyment|Adaptability">t(77.7)=1.792, p=0.077 †</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Engagement composite</div>
+                    <div class="cs">No (3.87) · Yes (3.41)</div>
+                    <div class="cw" style="height: 200px"><canvas id="s_eng_a"></canvas></div>
+                    <div class="bd"><span class="b sig" data-stat="2.3 Engagement|Adaptability">t(72.6)=2.107, p=0.039 *</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Clarity composite</div>
+                    <div class="cs">No (3.85) · Yes (3.38)</div>
+                    <div class="cw" style="height: 200px"><canvas id="s_scaf_a"></canvas></div>
+                    <div class="bd"><span class="b sig" data-stat="2.4 Scaffolding|Adaptability">t(75.3)=2.222, p=0.029 *</span></div>
+                </div>
+            </div>
+            <div class="fn">All Likert items are rated 1–5, and each composite is just the row-wise mean of its items. We used Welch's t-test throughout, since it doesn't assume equal variances between groups.</div>
+        </section>
 
-  <div class="dv">Stars earned — sum of L4–L7 boolean columns (max=4 · N=84, 6 outliers removed)</div>
-  <div class="lg">
-    <span><span class="sw" style="background:var(--blue)"></span>Low</span><span><span class="sw" style="background:var(--teal)"></span>Moderate</span><span><span class="sw" style="background:var(--coral)"></span>High</span>
-    <span><span class="sw" style="background:var(--purple)"></span>No adapt.</span><span><span class="sw" style="background:var(--amber)"></span>With adapt.</span>
-  </div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Stars by implicitness (N=84)</div>
-      <div class="cs">Low (0.88) · Moderate (1.30) · High (1.14)</div>
-      <div class="cw" style="height:190px"><canvas id="p_st_i"></canvas></div>
-      <div class="bd"><span class="b ns">F(2,81)=1.251, p=0.292 ns</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Stars by adaptability (N=84)</div>
-      <div class="cs">No (1.27) · Yes (0.95)</div>
-      <div class="cw" style="height:190px"><canvas id="p_st_a"></canvas></div>
-      <div class="bd"><span class="b ns">t(81.4)=0.562, p=0.576 ns</span></div>
-    </div>
-  </div>
+        <!-- All 10 Items -->
+        <section class="section" id="tab-items">
+            <div class="sh">
+                <h2>All 10 survey items</h2>
+                <p>Individual item means, each on a 1–5 Likert scale. Items 1 through 5 feed into the Enjoyment and Engagement composites; items 6 through 10 feed into Clarity.</p>
+            </div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">All items by implicitness</div>
+                    <div class="cs">Low implicitness scores highest on almost every item, and high implicitness scores lowest.</div>
+                    <div class="lg">
+                        <span><span class="sw" style="background: var(--blue)"></span>Low</span>
+                        <span><span class="sw" style="background: var(--teal)"></span>Moderate</span>
+                        <span><span class="sw" style="background: var(--coral)"></span>High</span>
+                    </div>
+                    <div class="cw" style="height: 400px"><canvas id="items_i"></canvas></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">All items by adaptability</div>
+                    <div class="cs">Players without adaptive difficulty scored higher on every single item, no exceptions.</div>
+                    <div class="lg">
+                        <span><span class="sw" style="background: var(--purple)"></span>No adaptability</span>
+                        <span><span class="sw" style="background: var(--amber)"></span>With adaptability</span>
+                    </div>
+                    <div class="cw" style="height: 400px"><canvas id="items_a"></canvas></div>
+                </div>
+            </div>
+        </section>
 
-  <div class="dv">Total deaths — before (N=90) vs. after outlier removal (N=83, 7 removed)</div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Deaths by implicitness — before / after</div>
-      <div class="cs">Moderate's apparent high-death pattern collapses entirely after outlier removal</div>
-      <div class="cw" style="height:200px"><canvas id="p_d_i"></canvas></div>
-      <div class="bd"><span class="b ns">Before: p=0.119 ns</span><span class="b ns">After: F(2,80)=0.498, p=0.610 ns</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Deaths by adaptability — before / after</div>
-      <div class="cs">No (11.3→6.9) · Yes (10.5→8.6) — direction reverses after cleaning</div>
-      <div class="cw" style="height:200px"><canvas id="p_d_a"></canvas></div>
-      <div class="bd"><span class="b ns">Before: p=0.792 ns</span><span class="b ns">After: t(63.9)=−0.869, p=0.388 ns</span></div>
-    </div>
-  </div>
+        <!-- Performance -->
+        <section class="section" id="tab-performance">
+            <div class="sh">
+                <h2>Performance metrics</h2>
+                <p>Stars, deaths, total time, and button presses per second, shown before and after outlier removal where that applies. Stars are corrected to N=84 after 6 outliers were removed.</p>
+            </div>
 
-  <div class="dv">Total time (seconds) — before (N=90) vs. after outlier removal (N=83, 7 removed)</div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Time by implicitness — before / after</div>
-      <div class="cs">Extreme outliers inflated means by 200–300s; gap narrows substantially after cleaning</div>
-      <div class="cw" style="height:200px"><canvas id="p_t_i"></canvas></div>
-      <div class="bd"><span class="b ns">Before: p=0.512 ns</span><span class="b ns">After: F(2,80)=0.999, p=0.373 ns</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Time by adaptability — before / after</div>
-      <div class="cs">No (418→248s) · Yes (509→224s)</div>
-      <div class="cw" style="height:200px"><canvas id="p_t_a"></canvas></div>
-      <div class="bd"><span class="b ns">Before: p=0.721 ns</span><span class="b ns">After: t(79.2)=0.687, p=0.494 ns</span></div>
-    </div>
-  </div>
+            <div class="dv">Stars earned: sum of L4–L7 boolean columns (max=4 · N=84, 6 outliers removed)</div>
+            <div class="lg">
+                <span><span class="sw" style="background: var(--blue)"></span>Low</span>
+                <span><span class="sw" style="background: var(--teal)"></span>Moderate</span>
+                <span><span class="sw" style="background: var(--coral)"></span>High</span>
+                <span><span class="sw" style="background: var(--purple)"></span>No adapt.</span>
+                <span><span class="sw" style="background: var(--amber)"></span>With adapt.</span>
+            </div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Stars by implicitness (N=84)</div>
+                    <div class="cs">Low (0.88) · Moderate (1.30) · High (1.14)</div>
+                    <div class="cw" style="height: 190px"><canvas id="p_st_i"></canvas></div>
+                    <div class="bd"><span class="b ns" data-stat="1.5 Stars|Implicitness">F(2,81)=1.251, p=0.292 ns</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Stars by adaptability (N=84)</div>
+                    <div class="cs">No (1.27) · Yes (0.95)</div>
+                    <div class="cw" style="height: 190px"><canvas id="p_st_a"></canvas></div>
+                    <div class="bd"><span class="b ns" data-stat="2.5 Stars|Adaptability">t(81.4)=0.562, p=0.576 ns</span></div>
+                </div>
+            </div>
 
-  <div class="dv">Average button presses per second — before (N=90) vs. after (N=87, 3 removed)</div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">BPS by implicitness — before / after</div>
-      <div class="cs">Near-identical across all groups; no meaningful variation</div>
-      <div class="cw" style="height:190px"><canvas id="p_b_i"></canvas></div>
-      <div class="bd"><span class="b ns">Before: p=0.899 ns</span><span class="b ns">After: F(2,84)=0.024, p=0.976 ns</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">BPS by adaptability — before / after</div>
-      <div class="cs">No (1.86→1.81) · Yes (1.81→1.69)</div>
-      <div class="cw" style="height:190px"><canvas id="p_b_a"></canvas></div>
-      <div class="bd"><span class="b ns">Before: p=0.793 ns</span><span class="b ns">After: t(72.6)=0.721, p=0.473 ns</span></div>
-    </div>
-  </div>
-  <div class="fn">Before/after comparisons use darker bars for raw data, lighter bars for cleaned data. Welch t-tests used for all adaptability comparisons.</div>
-</section>
+            <div class="dv">Total deaths: before (N=90) vs. after outlier removal (N=83, 7 removed)</div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Deaths by implicitness (before / after)</div>
+                    <div class="cs">Moderate's apparent high-death pattern disappears completely once the outliers are removed.</div>
+                    <div class="cw" style="height: 200px"><canvas id="p_d_i"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns">Before: p=0.119 ns</span>
+                        <span class="b ns" data-stat="1.6 Deaths|Implicitness" data-prefix="After: ">After: F(2,80)=0.498, p=0.610 ns</span>
+                    </div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Deaths by adaptability (before / after)</div>
+                    <div class="cs">No (11.3 → 6.9) · Yes (10.5 → 8.6): the direction actually flips after cleaning.</div>
+                    <div class="cw" style="height: 200px"><canvas id="p_d_a"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns">Before: p=0.792 ns</span>
+                        <span class="b ns" data-stat="2.6 Deaths|Adaptability" data-prefix="After: ">After: t(63.9)=−0.869, p=0.388 ns</span>
+                    </div>
+                </div>
+            </div>
 
-<!-- ══ PER-LEVEL ══ -->
-<section class="section" id="tab-levels">
-  <div class="sh"><h2>Per-level analysis</h2><p>Time and BPS broken down by level. Outliers removed independently per level (IQR × 1.5). L6 and L7 significance tests from official analysis CSV; L1–L5 from preliminary analysis. N shrinks at later levels.</p></div>
+            <div class="dv">Total time (seconds): before (N=90) vs. after outlier removal (N=83, 7 removed)</div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Time by implicitness (before / after)</div>
+                    <div class="cs">A handful of extreme outliers inflated the means by 200–300 seconds; the gap narrows a lot once cleaned.</div>
+                    <div class="cw" style="height: 200px"><canvas id="p_t_i"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns">Before: p=0.512 ns</span>
+                        <span class="b ns" data-stat="1.7 Total Time|Implicitness" data-prefix="After: ">After: F(2,80)=0.999, p=0.373 ns</span>
+                    </div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Time by adaptability (before / after)</div>
+                    <div class="cs">No (418 → 248s) · Yes (509 → 224s)</div>
+                    <div class="cw" style="height: 200px"><canvas id="p_t_a"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns">Before: p=0.721 ns</span>
+                        <span class="b ns" data-stat="2.7 Total Time|Adaptability" data-prefix="After: ">After: t(79.2)=0.687, p=0.494 ns</span>
+                    </div>
+                </div>
+            </div>
 
-  <div class="dv">Time per level (seconds · cleaned per level)</div>
-  <div class="lg">
-    <span><span class="sl" style="background:var(--blue)"></span>Low</span>
-    <span><span class="sl" style="background:var(--teal)"></span>Moderate</span>
-    <span><span class="sl" style="background:var(--coral)"></span>High</span>
-    <span><span class="sl" style="background:var(--purple)"></span>No adapt.</span>
-    <span><span class="sl" style="background:var(--amber)"></span>With adapt.</span>
-  </div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Time per level by implicitness</div>
-      <div class="cs">No significant implicitness effect on time at any level per official analysis</div>
-      <div class="cw" style="height:250px"><canvas id="l_ti_i"></canvas></div>
-      <div class="bd">
-        <span class="b ns">L6: F(2,57)=1.629, p=0.205 ns (N=60)</span>
-        <span class="b ns">L7: F(2,37)=0.002, p=0.998 ns (N=40)</span>
-      </div>
-    </div>
-    <div class="cc">
-      <div class="ct">Time per level by adaptability</div>
-      <div class="cs">No adaptability effect on time at any level</div>
-      <div class="cw" style="height:250px"><canvas id="l_ti_a"></canvas></div>
-      <div class="bd">
-        <span class="b ns">L6: t(57.8)=1.189, p=0.239 ns</span>
-        <span class="b ns">L7: t(37.1)=−0.853, p=0.399 ns</span>
-      </div>
-    </div>
-  </div>
+            <div class="dv">Average button presses per second: before (N=90) vs. after (N=87, 3 removed)</div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">BPS by implicitness (before / after)</div>
+                    <div class="cs">Nearly identical across all three groups; there's just no meaningful variation here.</div>
+                    <div class="cw" style="height: 190px"><canvas id="p_b_i"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns">Before: p=0.899 ns</span>
+                        <span class="b ns" data-stat="1.8 BPS|Implicitness" data-prefix="After: ">After: F(2,84)=0.024, p=0.976 ns</span>
+                    </div>
+                </div>
+                <div class="cc">
+                    <div class="ct">BPS by adaptability (before / after)</div>
+                    <div class="cs">No (1.86 → 1.81) · Yes (1.81 → 1.69)</div>
+                    <div class="cw" style="height: 190px"><canvas id="p_b_a"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns">Before: p=0.793 ns</span>
+                        <span class="b ns" data-stat="2.8 BPS|Adaptability" data-prefix="After: ">After: t(72.6)=0.721, p=0.473 ns</span>
+                    </div>
+                </div>
+            </div>
+            <div class="fn">In the before/after charts, darker bars show the raw data and lighter bars show the cleaned data. Welch's t-test was used for every adaptability comparison.</div>
+        </section>
 
-  <div class="dv">BPS per level (button presses ÷ time · cleaned per level)</div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">BPS per level by implicitness</div>
-      <div class="cs">L1 dramatically lower (~0.2) as introductory level; stabilises from L2 onward</div>
-      <div class="cw" style="height:250px"><canvas id="l_bp_i"></canvas></div>
-      <div class="bd">
-        <span class="b ns">L6: F(2,59)=0.845, p=0.435 ns (N=62)</span>
-        <span class="b ns">L7: F(2,38)=0.020, p=0.980 ns (N=41)</span>
-      </div>
-    </div>
-    <div class="cc">
-      <div class="ct">BPS per level by adaptability</div>
-      <div class="cs">No adaptability effect on input rate at any level</div>
-      <div class="cw" style="height:250px"><canvas id="l_bp_a"></canvas></div>
-      <div class="bd">
-        <span class="b ns">L6: t(40)=−0.543, p=0.590 ns</span>
-        <span class="b ns">L7: t(25)=1.466, p=0.155 ns</span>
-      </div>
-    </div>
-  </div>
+        <!-- Per-level Analysis -->
+        <section class="section" id="tab-levels">
+            <div class="sh">
+                <h2>Per-level analysis</h2>
+                <p>Time and BPS broken down level by level. Outliers were removed independently at each level using IQR × 1.5. Significance tests for L6 and L7 come from the official analysis CSV; L1–L5 are from preliminary analysis. Sample size naturally shrinks as players progress.</p>
+            </div>
 
-  <div class="dv">Players with data per level</div>
-  <div class="cc">
-    <div class="ct">N per level (before per-level outlier removal)</div>
-    <div class="cs">Attrition reflects players who did not reach or complete later levels</div>
-    <div class="cw" style="height:180px"><canvas id="l_n"></canvas></div>
-  </div>
-  <div class="fn">N per level: L1=90, L2=83, L3=80, L4=77, L5=72, L6=65, L7=44. Official analysis covers L6 and L7 only. BPS = button presses per second.</div>
-</section>
+            <div class="dv">Time per level (seconds · cleaned per level)</div>
+            <div class="lg">
+                <span><span class="sl" style="background: var(--blue)"></span>Low</span>
+                <span><span class="sl" style="background: var(--teal)"></span>Moderate</span>
+                <span><span class="sl" style="background: var(--coral)"></span>High</span>
+                <span><span class="sl" style="background: var(--purple)"></span>No adapt.</span>
+                <span><span class="sl" style="background: var(--amber)"></span>With adapt.</span>
+            </div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Time per level by implicitness</div>
+                    <div class="cs">No significant implicitness effect on time shows up at any level, per the official analysis.</div>
+                    <div class="cw" style="height: 250px"><canvas id="l_ti_i"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns" data-stat="1.9a L6 Time|Implicitness" data-prefix="L6: " data-suffix=" (N=60)">L6: F(2,57)=1.629, p=0.205 ns (N=60)</span>
+                        <span class="b ns" data-stat="1.9c L7 Time|Implicitness" data-prefix="L7: " data-suffix=" (N=40)">L7: F(2,37)=0.002, p=0.998 ns (N=40)</span>
+                    </div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Time per level by adaptability</div>
+                    <div class="cs">Adaptability doesn't move time at any level either.</div>
+                    <div class="cw" style="height: 250px"><canvas id="l_ti_a"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns" data-stat="2.9a L6 Time|Adaptability" data-prefix="L6: ">L6: t(57.8)=1.189, p=0.239 ns</span>
+                        <span class="b ns" data-stat="2.9c L7 Time|Adaptability" data-prefix="L7: ">L7: t(37.1)=−0.853, p=0.399 ns</span>
+                    </div>
+                </div>
+            </div>
 
-<!-- ══ COMPLETION ══ -->
-<section class="section" id="tab-completion">
-  <div class="sh"><h2>Game completion</h2><p>Whether players completed the game (yes/no) across conditions. Chi-square tests used for categorical outcome.</p></div>
-  <div class="mr">
-    <div class="mc"><div class="lbl">Overall completion</div><div class="val">46.7%</div><div class="sub">42 of 90</div></div>
-    <div class="mc"><div class="lbl">Low implicitness</div><div class="val">60.0%</div><div class="sub">15 of 25 — highest</div></div>
-    <div class="mc"><div class="lbl">High implicitness</div><div class="val">28.6%</div><div class="sub">8 of 28 — lowest</div></div>
-    <div class="mc"><div class="lbl">High impl. + adapt.</div><div class="val">16.7%</div><div class="sub">2 of 12 — worst subgroup</div></div>
-  </div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Completion by implicitness (stacked %)</div>
-      <div class="cs">Low (60%) · Moderate (51%) · High (29%)</div>
-      <div class="cw" style="height:230px"><canvas id="c_i"></canvas></div>
-      <div class="bd"><span class="b marg">χ²(2)=5.796, p=0.055 †</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Completion by adaptability (stacked %)</div>
-      <div class="cs">No (52%) · Yes (40%)</div>
-      <div class="cw" style="height:230px"><canvas id="c_a"></canvas></div>
-      <div class="bd"><span class="b ns">χ²(1)=0.913, p=0.339 ns</span></div>
-    </div>
-  </div>
-  <div class="cc">
-    <div class="ct">Completion rate — implicitness × adaptability</div>
-    <div class="cs">Adaptability helps slightly at low implicitness but severely hurts at high implicitness (16.7%)</div>
-    <div class="lg" style="margin-top:8px">
-      <span><span class="sw" style="background:var(--purple)"></span>No adaptability</span>
-      <span><span class="sw" style="background:var(--amber)"></span>With adaptability</span>
-    </div>
-    <div class="cw" style="height:240px"><canvas id="c_int"></canvas></div>
-    <div class="bd"><span class="b ns">Two-way interaction: F(2,84)=0.799, p=0.453 ns</span></div>
-  </div>
-  <div class="fn">Chi-square test for independence. Subgroup Ns: High/No=16, High/Yes=12, Low/No=16, Low/Yes=9, Moderate/No=20, Moderate/Yes=17.</div>
-</section>
+            <div class="dv">BPS per level (button presses ÷ time · cleaned per level)</div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">BPS per level by implicitness</div>
+                    <div class="cs">L1 is dramatically lower (around 0.2) since it's the introductory level; things settle down from L2 on.</div>
+                    <div class="cw" style="height: 250px"><canvas id="l_bp_i"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns" data-stat="1.9b L6 BPS|Implicitness" data-prefix="L6: " data-suffix=" (N=62)">L6: F(2,59)=0.845, p=0.435 ns (N=62)</span>
+                        <span class="b ns" data-stat="1.9d L7 BPS|Implicitness" data-prefix="L7: " data-suffix=" (N=41)">L7: F(2,38)=0.020, p=0.980 ns (N=41)</span>
+                    </div>
+                </div>
+                <div class="cc">
+                    <div class="ct">BPS per level by adaptability</div>
+                    <div class="cs">Adaptability has no effect on input rate at any level.</div>
+                    <div class="cw" style="height: 250px"><canvas id="l_bp_a"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns" data-stat="2.9b L6 BPS|Adaptability" data-prefix="L6: ">L6: t(40)=−0.543, p=0.590 ns</span>
+                        <span class="b ns" data-stat="2.9d L7 BPS|Adaptability" data-prefix="L7: ">L7: t(25)=1.466, p=0.155 ns</span>
+                    </div>
+                </div>
+            </div>
 
-<!-- ══ INTERACTION ══ -->
-<section class="section" id="tab-interaction">
-  <div class="sh"><h2>Two-way ANOVA interactions</h2><p>Interaction terms (Implicitness × Adaptability) for all metrics from official analysis CSV. Only enjoyment showed a marginally significant interaction.</p></div>
-  <div class="cc" style="margin-bottom:16px">
-    <div class="ct">Two-way ANOVA summary — all metrics</div>
-    <div class="cs">Adaptability main effects and interaction F-statistics. Implicitness main effects from one-way ANOVAs (Section 1).</div>
-    <table class="st">
-      <thead><tr><th>Metric</th><th>N</th><th>Adaptability (main)</th><th>Interaction (Impl × Adapt)</th></tr></thead>
-      <tbody>
-        <tr><td>Enjoyment</td><td>90</td><td><span class="b marg">F(1,84)=3.478, p=0.066 †</span></td><td><span class="b marg">F(2,84)=2.855, p=0.063 †</span></td></tr>
-        <tr><td>Engagement</td><td>90</td><td><span class="b sig">F(1,84)=4.430, p=0.038 *</span></td><td><span class="b ns">F(2,84)=0.815, p=0.446 ns</span></td></tr>
-        <tr><td>Clarity</td><td>90</td><td><span class="b sig">F(1,84)=4.646, p=0.034 *</span></td><td><span class="b ns">F(2,84)=1.015, p=0.367 ns</span></td></tr>
-        <tr><td>Stars (corrected)</td><td>84</td><td><span class="b ns">F(1,78)=0.575, p=0.451 ns</span></td><td><span class="b ns">F(2,78)=0.706, p=0.497 ns</span></td></tr>
-        <tr><td>Total deaths (cleaned)</td><td>83</td><td><span class="b ns">F(1,77)=0.936, p=0.336 ns</span></td><td><span class="b ns">F(2,77)=0.493, p=0.613 ns</span></td></tr>
-        <tr><td>Total time (cleaned)</td><td>83</td><td><span class="b ns">F(1,77)=0.320, p=0.573 ns</span></td><td><span class="b ns">F(2,77)=0.034, p=0.967 ns</span></td></tr>
-        <tr><td>BPS (cleaned)</td><td>87</td><td><span class="b ns">F(1,81)=0.500, p=0.482 ns</span></td><td><span class="b ns">F(2,81)=0.680, p=0.510 ns</span></td></tr>
-        <tr><td>Completion</td><td>90</td><td><span class="b ns">F(1,84)=1.244, p=0.268 ns</span></td><td><span class="b ns">F(2,84)=0.799, p=0.453 ns</span></td></tr>
-        <tr><td>L6 Time</td><td>60</td><td><span class="b ns">F(1,54)=0.707, p=0.404 ns</span></td><td><span class="b ns">F(2,54)=1.449, p=0.244 ns</span></td></tr>
-        <tr><td>L6 BPS</td><td>62</td><td><span class="b ns">F(1,56)=0.216, p=0.644 ns</span></td><td><span class="b ns">F(2,56)=0.205, p=0.816 ns</span></td></tr>
-        <tr><td>L7 Time</td><td>40</td><td><span class="b ns">F(1,34)=0.614, p=0.439 ns</span></td><td><span class="b ns">F(2,34)=1.680, p=0.202 ns</span></td></tr>
-        <tr><td>L7 BPS</td><td>41</td><td><span class="b ns">F(1,35)=2.323, p=0.137 ns</span></td><td><span class="b ns">F(2,35)=0.600, p=0.554 ns</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="dv">Enjoyment — the only marginal interaction (p=0.063†)</div>
-  <div class="lg">
-    <span><span class="sl" style="background:var(--purple)"></span>No adaptability</span>
-    <span><span class="sl" style="background:var(--amber)"></span>With adaptability</span>
-  </div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Enjoyment cell means (grouped bar)</div>
-      <div class="cs">High/no=2.85 · High/yes=3.25 · Low/no=3.75 · Low/yes=2.96 · Mod/no=3.92 · Mod/yes=3.06</div>
-      <div class="cw" style="height:220px"><canvas id="int_bar"></canvas></div>
-      <div class="bd"><span class="b marg">Interaction F(2,84)=2.855, p=0.063 †</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Enjoyment interaction plot (line)</div>
-      <div class="cs">Lines cross at high implicitness — disordinal interaction: adaptability reverses direction</div>
-      <div class="cw" style="height:220px"><canvas id="int_line"></canvas></div>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Engagement cell means</div>
-      <div class="cs">Near-parallel lines — additive effects only (p=0.446 ns)</div>
-      <div class="cw" style="height:190px"><canvas id="int_eng"></canvas></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Clarity cell means</div>
-      <div class="cs">Near-parallel lines — additive effects only (p=0.367 ns)</div>
-      <div class="cw" style="height:190px"><canvas id="int_scaf"></canvas></div>
-    </div>
-  </div>
-  <div class="fn">Two-way ANOVA values from official analysis CSV (S3-Interaction). Implicitness main effects not included in CSV — see one-way ANOVA section.</div>
-</section>
+            <div class="dv">Players with data per level</div>
+            <div class="cc">
+                <div class="ct">N per level (before per-level outlier removal)</div>
+                <div class="cs">The drop-off reflects players who simply didn't reach or finish the later levels.</div>
+                <div class="cw" style="height: 180px"><canvas id="l_n"></canvas></div>
+            </div>
+            <div class="fn">N per level: L1=90, L2=83, L3=80, L4=77, L5=72, L6=65, L7=44. The official analysis only covers L6 and L7. BPS stands for button presses per second.</div>
+        </section>
 
-<!-- ══ DEMOGRAPHICS ══ -->
-<section class="section" id="tab-demographics">
-  <div class="sh"><h2>Demographic analysis</h2><p>Effects of gender, grade level, and age on learning outcomes. Note: the CSV does not include demographic tests — values below are from preliminary analysis and should be interpreted with caution.</p></div>
+        <!-- Completion -->
+        <section class="section" id="tab-completion">
+            <div class="sh">
+                <h2>Game completion</h2>
+                <p>Whether players finished the game or not, compared across conditions. Since this is a categorical outcome, we used chi-square tests.</p>
+            </div>
+            <div class="mr">
+                <div class="mc">
+                    <div class="lbl">Overall completion</div>
+                    <div class="val">46.7%</div>
+                    <div class="sub">42 of 90</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Low implicitness</div>
+                    <div class="val">60.0%</div>
+                    <div class="sub">15 of 25 (highest)</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">High implicitness</div>
+                    <div class="val">28.6%</div>
+                    <div class="sub">8 of 28 (lowest)</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">High impl. + adapt.</div>
+                    <div class="val">16.7%</div>
+                    <div class="sub">2 of 12 (worst subgroup)</div>
+                </div>
+            </div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Completion by implicitness (stacked %)</div>
+                    <div class="cs">Low (60%) · Moderate (51%) · High (29%)</div>
+                    <div class="cw" style="height: 230px"><canvas id="c_i"></canvas></div>
+                    <div class="bd"><span class="b marg" data-stat="1.1 Completion|Group">χ²(2)=5.796, p=0.055 †</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Completion by adaptability (stacked %)</div>
+                    <div class="cs">No (52%) · Yes (40%)</div>
+                    <div class="cw" style="height: 230px"><canvas id="c_a"></canvas></div>
+                    <div class="bd"><span class="b ns" data-stat="2.1 Completion|Group">χ²(1)=0.913, p=0.339 ns</span></div>
+                </div>
+            </div>
+            <div class="cc">
+                <div class="ct">Completion rate (implicitness × adaptability)</div>
+                <div class="cs">Adaptability helps a little at low implicitness, but it really hurts at high implicitness, dropping all the way to 16.7%.</div>
+                <div class="lg" style="margin-top: 8px">
+                    <span><span class="sw" style="background: var(--purple)"></span>No adaptability</span>
+                    <span><span class="sw" style="background: var(--amber)"></span>With adaptability</span>
+                </div>
+                <div class="cw" style="height: 240px"><canvas id="c_int"></canvas></div>
+                <div class="bd"><span class="b ns" data-stat="3.1 Completion|Interaction" data-prefix="Two-way interaction: ">Two-way interaction: F(2,84)=0.799, p=0.453 ns</span></div>
+            </div>
+            <div class="fn">Chi-square test for independence. Subgroup sample sizes: High/No=16, High/Yes=12, Low/No=16, Low/Yes=9, Moderate/No=20, Moderate/Yes=17.</div>
+        </section>
 
-  <div class="mr">
-    <div class="mc"><div class="lbl">Male</div><div class="val">49</div><div class="sub">54.4% of sample</div></div>
-    <div class="mc"><div class="lbl">Female</div><div class="val">35</div><div class="sub">38.9% of sample</div></div>
-    <div class="mc"><div class="lbl">Ages</div><div class="val">14–18</div><div class="sub">Modal age = 16 (n=30)</div></div>
-    <div class="mc"><div class="lbl">Grades</div><div class="val">9–12</div><div class="sub">Modal grade = 10 (n=30)</div></div>
-  </div>
+        <!-- Interactions -->
+        <section class="section" id="tab-interaction">
+            <div class="sh">
+                <h2>Two-way ANOVA interactions</h2>
+                <p>Interaction terms (implicitness × adaptability) for every metric in the official analysis CSV. Enjoyment was the only one with a marginally significant interaction.</p>
+            </div>
+            <div class="cc" style="margin-bottom: 16px">
+                <div class="ct">Two-way ANOVA summary of all metrics</div>
+                <div class="cs">Adaptability main effects and interaction F-statistics. Implicitness main effects come from the one-way ANOVAs in the earlier section.</div>
+                <table class="st">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>N</th>
+                            <th>Adaptability (main)</th>
+                            <th>Interaction (Impl × Adapt)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Enjoyment</td>
+                            <td>90</td>
+                            <td><span class="b marg" data-stat="3.2 Enjoyment|Adaptability">F(1,84)=3.478, p=0.066 †</span></td>
+                            <td><span class="b marg" data-stat="3.2 Enjoyment|Interaction">F(2,84)=2.855, p=0.063 †</span></td>
+                        </tr>
+                        <tr>
+                            <td>Engagement</td>
+                            <td>90</td>
+                            <td><span class="b sig" data-stat="3.3 Engagement|Adaptability">F(1,84)=4.430, p=0.038 *</span></td>
+                            <td><span class="b ns" data-stat="3.3 Engagement|Interaction">F(2,84)=0.815, p=0.446 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>Clarity</td>
+                            <td>90</td>
+                            <td><span class="b sig" data-stat="3.4 Scaffolding|Adaptability">F(1,84)=4.646, p=0.034 *</span></td>
+                            <td><span class="b ns" data-stat="3.4 Scaffolding|Interaction">F(2,84)=1.015, p=0.367 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>Stars (corrected)</td>
+                            <td>84</td>
+                            <td><span class="b ns" data-stat="3.5 Stars|Adaptability">F(1,78)=0.575, p=0.451 ns</span></td>
+                            <td><span class="b ns" data-stat="3.5 Stars|Interaction">F(2,78)=0.706, p=0.497 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>Total deaths (cleaned)</td>
+                            <td>83</td>
+                            <td><span class="b ns" data-stat="3.6 Deaths|Adaptability">F(1,77)=0.936, p=0.336 ns</span></td>
+                            <td><span class="b ns" data-stat="3.6 Deaths|Interaction">F(2,77)=0.493, p=0.613 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>Total time (cleaned)</td>
+                            <td>83</td>
+                            <td><span class="b ns" data-stat="3.7 Total Time|Adaptability">F(1,77)=0.320, p=0.573 ns</span></td>
+                            <td><span class="b ns" data-stat="3.7 Total Time|Interaction">F(2,77)=0.034, p=0.967 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>BPS (cleaned)</td>
+                            <td>87</td>
+                            <td><span class="b ns" data-stat="3.8 BPS|Adaptability">F(1,81)=0.500, p=0.482 ns</span></td>
+                            <td><span class="b ns" data-stat="3.8 BPS|Interaction">F(2,81)=0.680, p=0.510 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>Completion</td>
+                            <td>90</td>
+                            <td><span class="b ns" data-stat="3.1 Completion|Adaptability">F(1,84)=1.244, p=0.268 ns</span></td>
+                            <td><span class="b ns" data-stat="3.1 Completion|Interaction">F(2,84)=0.799, p=0.453 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>L6 Time</td>
+                            <td>60</td>
+                            <td><span class="b ns" data-stat="3.9a L6 Time|Adaptability">F(1,54)=0.707, p=0.404 ns</span></td>
+                            <td><span class="b ns" data-stat="3.9a L6 Time|Interaction">F(2,54)=1.449, p=0.244 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>L6 BPS</td>
+                            <td>62</td>
+                            <td><span class="b ns" data-stat="3.9b L6 BPS|Adaptability">F(1,56)=0.216, p=0.644 ns</span></td>
+                            <td><span class="b ns" data-stat="3.9b L6 BPS|Interaction">F(2,56)=0.205, p=0.816 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>L7 Time</td>
+                            <td>40</td>
+                            <td><span class="b ns" data-stat="3.9c L7 Time|Adaptability">F(1,34)=0.614, p=0.439 ns</span></td>
+                            <td><span class="b ns" data-stat="3.9c L7 Time|Interaction">F(2,34)=1.680, p=0.202 ns</span></td>
+                        </tr>
+                        <tr>
+                            <td>L7 BPS</td>
+                            <td>41</td>
+                            <td><span class="b ns" data-stat="3.9d L7 BPS|Adaptability">F(1,35)=2.323, p=0.137 ns</span></td>
+                            <td><span class="b ns" data-stat="3.9d L7 BPS|Interaction">F(2,35)=0.600, p=0.554 ns</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="dv">Enjoyment (p=0.063†)</div>
+            <div class="lg">
+                <span><span class="sl" style="background: var(--purple)"></span>No adaptability</span>
+                <span><span class="sl" style="background: var(--amber)"></span>With adaptability</span>
+            </div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Enjoyment cell means (grouped bar)</div>
+                    <div class="cs">High/no=2.85 · High/yes=3.25 · Low/no=3.75 · Low/yes=2.96 · Mod/no=3.92 · Mod/yes=3.06</div>
+                    <div class="cw" style="height: 220px"><canvas id="int_bar"></canvas></div>
+                    <div class="bd"><span class="b marg" data-stat="3.2 Enjoyment|Interaction" data-prefix="Interaction ">Interaction F(2,84)=2.855, p=0.063 †</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Enjoyment interaction plot (line)</div>
+                    <div class="cs">The lines cross at high implicitness: a disordinal interaction, where adaptability actually flips direction.</div>
+                    <div class="cw" style="height: 220px"><canvas id="int_line"></canvas></div>
+                </div>
+            </div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Engagement cell means</div>
+                    <div class="cs">The lines run nearly parallel here; just additive effects, nothing more (p=0.446 ns).</div>
+                    <div class="cw" style="height: 190px"><canvas id="int_eng"></canvas></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Clarity cell means</div>
+                    <div class="cs">Parallel lines, additive effects only (p=0.367 ns).</div>
+                    <div class="cw" style="height: 190px"><canvas id="int_scaf"></canvas></div>
+                </div>
+            </div>
+            <div class="fn">Two-way ANOVA values pulled from the official analysis CSV (S3-Interaction). Implicitness main effects weren't included in that CSV. See the one-way ANOVA section instead.</div>
+        </section>
 
-  <div class="dv">Gender — engagement, clarity, and completion</div>
-  <div class="lg">
-    <span><span class="sw" style="background:var(--blue)"></span>Male (n=49)</span>
-    <span><span class="sw" style="background:var(--coral)"></span>Female (n=35)</span>
-    <span><span class="sw" style="background:var(--gray)"></span>Other (n=6)</span>
-  </div>
-  <div class="g3">
-    <div class="cc">
-      <div class="ct">Enjoyment by gender</div>
-      <div class="cs">Male (3.56) · Female (3.07) · Other (3.33)</div>
-      <div class="cw" style="height:190px"><canvas id="d_ge_enj"></canvas></div>
-      <div class="bd"><span class="b marg">ANOVA p=0.162; Male vs. Female p=0.063 †</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Engagement by gender</div>
-      <div class="cs">Male (3.91) · Female (3.33) · Other (3.75)</div>
-      <div class="cw" style="height:190px"><canvas id="d_ge_eng"></canvas></div>
-      <div class="bd"><span class="b sig">ANOVA p=0.033 *; Male vs. Female p=0.010 *</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Clarity by gender</div>
-      <div class="cs">Male (3.90) · Female (3.28) · Other (3.77)</div>
-      <div class="cw" style="height:190px"><canvas id="d_ge_scaf"></canvas></div>
-      <div class="bd"><span class="b sig">ANOVA p=0.014 *; Male vs. Female p=0.004 *</span></div>
-    </div>
-  </div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Completion rate by gender</div>
-      <div class="cs">Male (61.2%) · Female (22.9%) · Other (66.7%)</div>
-      <div class="cw" style="height:210px"><canvas id="d_ge_comp"></canvas></div>
-      <div class="bd"><span class="b sig">ANOVA p=0.001 *; Male vs. Female χ²=10.632, p=0.001 *</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Stars earned by gender</div>
-      <div class="cs">Male (1.29) · Female (1.00) · Other (0.67)</div>
-      <div class="cw" style="height:210px"><canvas id="d_ge_stars"></canvas></div>
-      <div class="bd"><span class="b ns">ANOVA p=0.208 ns</span></div>
-    </div>
-  </div>
+        <!-- ══ DEMOGRAPHICS ══ -->
+        <section class="section" id="tab-demographics">
+            <div class="sh">
+                <h2>Demographic analysis</h2>
+                <p>How gender, grade level, and age relate to learning outcomes. Worth noting: the official CSV doesn't include demographic tests, so everything below comes from a preliminary analysis and should be read with that in mind.</p>
+            </div>
 
-  <div class="dv">Grade level — significant differences in deaths and time (cleaned, N=83)</div>
-  <div class="lg">
-    <span><span class="sw" style="background:var(--blue)"></span>Grade 9 (n=18)</span>
-    <span><span class="sw" style="background:var(--teal)"></span>Grade 10 (n=30)</span>
-    <span><span class="sw" style="background:var(--coral)"></span>Grade 11 (n=26)</span>
-    <span><span class="sw" style="background:var(--purple)"></span>Grade 12 (n=16)</span>
-  </div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Total deaths by grade (cleaned, N=83)</div>
-      <div class="cs">Grade 12 died substantially more than grades 10 and 11</div>
-      <div class="cw" style="height:210px"><canvas id="d_gr_deaths"></canvas></div>
-      <div class="bd">
-        <span class="b sig">ANOVA p=0.019 *</span>
-        <span class="b sig">Gr 10 vs 12: p=0.003 *</span>
-        <span class="b sig">Gr 11 vs 12: p=0.019 *</span>
-      </div>
-    </div>
-    <div class="cc">
-      <div class="ct">Total time by grade (cleaned, N=83)</div>
-      <div class="cs">Grade 12 spent significantly more time than grades 10 and 11</div>
-      <div class="cw" style="height:210px"><canvas id="d_gr_time"></canvas></div>
-      <div class="bd">
-        <span class="b sig">ANOVA p=0.039 *</span>
-        <span class="b sig">Gr 10 vs 12: p=0.007 *</span>
-        <span class="b sig">Gr 11 vs 12: p=0.034 *</span>
-      </div>
-    </div>
-  </div>
-  <div class="g3">
-    <div class="cc">
-      <div class="ct">Enjoyment by grade</div>
-      <div class="cs">Gr 9 (3.52) · 10 (3.29) · 11 (3.30) · 12 (3.38)</div>
-      <div class="cw" style="height:190px"><canvas id="d_gr_enj"></canvas></div>
-      <div class="bd"><span class="b ns">ANOVA p=0.916 ns</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Engagement by grade</div>
-      <div class="cs">Gr 9 (3.89) · 10 (3.50) · 11 (3.62) · 12 (3.84)</div>
-      <div class="cw" style="height:190px"><canvas id="d_gr_eng"></canvas></div>
-      <div class="bd"><span class="b ns">ANOVA p=0.534 ns</span></div>
-    </div>
-    <div class="cc">
-      <div class="ct">Completion rate by grade</div>
-      <div class="cs">Gr 9 (61%) · 10 (33%) · 11 (54%) · 12 (44%)</div>
-      <div class="cw" style="height:190px"><canvas id="d_gr_comp"></canvas></div>
-      <div class="bd"><span class="b ns">ANOVA p=0.243 ns</span></div>
-    </div>
-  </div>
+            <div class="mr">
+                <div class="mc">
+                    <div class="lbl">Male</div>
+                    <div class="val">49</div>
+                    <div class="sub">54.4% of sample</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Female</div>
+                    <div class="val">35</div>
+                    <div class="sub">38.9% of sample</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Ages</div>
+                    <div class="val">14–18</div>
+                    <div class="sub">Modal age = 16 (n=30)</div>
+                </div>
+                <div class="mc">
+                    <div class="lbl">Grades</div>
+                    <div class="val">9–12</div>
+                    <div class="sub">Modal grade = 10 (n=30)</div>
+                </div>
+            </div>
 
-  <div class="dv">Age — marginal effect on deaths (cleaned); no effect on subjective outcomes</div>
-  <div class="g2">
-    <div class="cc">
-      <div class="ct">Total deaths by age (cleaned, N=83)</div>
-      <div class="cs">Ages 15–16 died fewest; ages 14, 17, 18 died more</div>
-      <div class="cw" style="height:210px"><canvas id="d_age_deaths"></canvas></div>
-      <div class="bd">
-        <span class="b sig">ANOVA p=0.044 *</span>
-        <span class="b sig">Age 14 vs 16: p=0.046 *</span>
-        <span class="b sig">Age 16 vs 17: p=0.024 *</span>
-      </div>
-    </div>
-    <div class="cc">
-      <div class="ct">Enjoyment &amp; engagement by age</div>
-      <div class="cs">No consistent trend with age for subjective outcomes</div>
-      <div class="cw" style="height:210px"><canvas id="d_age_subj"></canvas></div>
-      <div class="bd">
-        <span class="b ns">Enjoyment p=0.592 ns</span>
-        <span class="b ns">Engagement p=0.621 ns</span>
-      </div>
-    </div>
-  </div>
-  <div class="fn">Demographic tests not included in official analysis CSV — values from preliminary analysis only. "Other" gender combines Nonbinary, Transgender Woman, Prefer not to say, and two informal responses (n=6). Interpret with caution due to small n. Gaming experience not collected; gender differences in completion likely confounded by prior gaming background.</div>
-</section>
+            <div class="dv">Gender: engagement, clarity, and completion</div>
+            <div class="lg">
+                <span><span class="sw" style="background: var(--blue)"></span>Male (n=49)</span>
+                <span><span class="sw" style="background: var(--coral)"></span>Female (n=35)</span>
+                <span><span class="sw" style="background: var(--gray)"></span>Other (n=6)</span>
+            </div>
+            <div class="g3">
+                <div class="cc">
+                    <div class="ct">Enjoyment by gender</div>
+                    <div class="cs">Male (3.56) · Female (3.07) · Other (3.33)</div>
+                    <div class="cw" style="height: 190px"><canvas id="d_ge_enj"></canvas></div>
+                    <div class="bd"><span class="b marg">ANOVA p=0.162; Male vs. Female p=0.063 †</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Engagement by gender</div>
+                    <div class="cs">Male (3.91) · Female (3.33) · Other (3.75)</div>
+                    <div class="cw" style="height: 190px"><canvas id="d_ge_eng"></canvas></div>
+                    <div class="bd"><span class="b sig">ANOVA p=0.033 *; Male vs. Female p=0.010 *</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Clarity by gender</div>
+                    <div class="cs">Male (3.90) · Female (3.28) · Other (3.77)</div>
+                    <div class="cw" style="height: 190px"><canvas id="d_ge_scaf"></canvas></div>
+                    <div class="bd"><span class="b sig">ANOVA p=0.014 *; Male vs. Female p=0.004 *</span></div>
+                </div>
+            </div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Completion rate by gender</div>
+                    <div class="cs">Male (61.2%) · Female (22.9%) · Other (66.7%)</div>
+                    <div class="cw" style="height: 210px"><canvas id="d_ge_comp"></canvas></div>
+                    <div class="bd"><span class="b sig">ANOVA p=0.001 *; Male vs. Female χ²=10.632, p=0.001 *</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Stars earned by gender</div>
+                    <div class="cs">Male (1.29) · Female (1.00) · Other (0.67)</div>
+                    <div class="cw" style="height: 210px"><canvas id="d_ge_stars"></canvas></div>
+                    <div class="bd"><span class="b ns">ANOVA p=0.208 ns</span></div>
+                </div>
+            </div>
 
-</main>
-<script>
-const BL='#185FA5',TL='#1D9E75',CO='#D85A30',PU='#534AB7',AM='#BA7517';
-const BLA='rgba(24,95,165,0.38)',TLA='rgba(29,158,117,0.38)',COA='rgba(216,90,48,0.38)';
-const PUA='rgba(83,74,183,0.38)',AMA='rgba(186,117,23,0.38)';
-const GY='#B4B2A9',GR='rgba(136,135,128,0.15)',TS='#888780';
-const LVLS=['L1','L2','L3','L4','L5','L6','L7'];
-const IL=['Low','Moderate','High'];
+            <div class="dv">Grade level: significant differences in deaths and time (cleaned, N=83)</div>
+            <div class="lg">
+                <span><span class="sw" style="background: var(--blue)"></span>Grade 9 (n=18)</span>
+                <span><span class="sw" style="background: var(--teal)"></span>Grade 10 (n=30)</span>
+                <span><span class="sw" style="background: var(--coral)"></span>Grade 11 (n=26)</span>
+                <span><span class="sw" style="background: var(--purple)"></span>Grade 12 (n=16)</span>
+            </div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Total deaths by grade (cleaned, N=83)</div>
+                    <div class="cs">Grade 12 students died substantially more often than grades 10 and 11.</div>
+                    <div class="cw" style="height: 210px"><canvas id="d_gr_deaths"></canvas></div>
+                    <div class="bd">
+                        <span class="b sig">ANOVA p=0.019 *</span>
+                        <span class="b sig">Gr 10 vs 12: p=0.003 *</span>
+                        <span class="b sig">Gr 11 vs 12: p=0.019 *</span>
+                    </div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Total time by grade (cleaned, N=83)</div>
+                    <div class="cs">Grade 12 also spent significantly more time in the game than grades 10 and 11.</div>
+                    <div class="cw" style="height: 210px"><canvas id="d_gr_time"></canvas></div>
+                    <div class="bd">
+                        <span class="b sig">ANOVA p=0.039 *</span>
+                        <span class="b sig">Gr 10 vs 12: p=0.007 *</span>
+                        <span class="b sig">Gr 11 vs 12: p=0.034 *</span>
+                    </div>
+                </div>
+            </div>
+            <div class="g3">
+                <div class="cc">
+                    <div class="ct">Enjoyment by grade</div>
+                    <div class="cs">Gr 9 (3.52) · 10 (3.29) · 11 (3.30) · 12 (3.38)</div>
+                    <div class="cw" style="height: 190px"><canvas id="d_gr_enj"></canvas></div>
+                    <div class="bd"><span class="b ns">ANOVA p=0.916 ns</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Engagement by grade</div>
+                    <div class="cs">Gr 9 (3.89) · 10 (3.50) · 11 (3.62) · 12 (3.84)</div>
+                    <div class="cw" style="height: 190px"><canvas id="d_gr_eng"></canvas></div>
+                    <div class="bd"><span class="b ns">ANOVA p=0.534 ns</span></div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Completion rate by grade</div>
+                    <div class="cs">Gr 9 (61%) · 10 (33%) · 11 (54%) · 12 (44%)</div>
+                    <div class="cw" style="height: 190px"><canvas id="d_gr_comp"></canvas></div>
+                    <div class="bd"><span class="b ns">ANOVA p=0.243 ns</span></div>
+                </div>
+            </div>
 
-// Tab nav
-document.getElementById('nav').addEventListener('click',e=>{
-  if(e.target.tagName!=='BUTTON')return;
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  e.target.classList.add('active');
-  document.getElementById('tab-'+e.target.dataset.tab).classList.add('active');
-});
+            <div class="dv">Age: marginal effect on deaths (cleaned); no effect on subjective outcomes</div>
+            <div class="g2">
+                <div class="cc">
+                    <div class="ct">Total deaths by age (cleaned, N=83)</div>
+                    <div class="cs">Ages 15 and 16 died the least; ages 14, 17, and 18 all died more often.</div>
+                    <div class="cw" style="height: 210px"><canvas id="d_age_deaths"></canvas></div>
+                    <div class="bd">
+                        <span class="b sig">ANOVA p=0.044 *</span>
+                        <span class="b sig">Age 14 vs 16: p=0.046 *</span>
+                        <span class="b sig">Age 16 vs 17: p=0.024 *</span>
+                    </div>
+                </div>
+                <div class="cc">
+                    <div class="ct">Enjoyment &amp; engagement by age</div>
+                    <div class="cs">No consistent trend with age shows up for either subjective outcome.</div>
+                    <div class="cw" style="height: 210px"><canvas id="d_age_subj"></canvas></div>
+                    <div class="bd">
+                        <span class="b ns">Enjoyment p=0.592 ns</span>
+                        <span class="b ns">Engagement p=0.621 ns</span>
+                    </div>
+                </div>
+            </div>
+            <div class="fn">Demographic tests aren't part of the official analysis CSV (treat these as preliminary). "Other" gender groups together Nonbinary, Transgender Woman, Prefer not to say, and two informal write-in responses (n=6), so interpret with caution given the small sample. Gaming experience wasn't collected, so the gender differences in completion are likely confounded by players' prior gaming background.</div>
+        </section>
 
-const sc=(yMin,yMax)=>({x:{grid:{display:false},ticks:{color:TS,font:{size:11}}},y:{min:yMin,max:yMax,grid:{color:GR},ticks:{color:TS,font:{size:11}}}});
-const bp=(id,labels,data,cols,yMin,yMax,suf='')=>{
-  new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{data,backgroundColor:cols,borderRadius:4,maxBarThickness:55}]},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.parsed.y.toFixed(2)+(suf?' '+suf:'')}}},scales:sc(yMin,yMax)}});
-};
-const ln=(id,labels,datasets,yMin,yMax,suf='')=>{
-  new Chart(document.getElementById(id),{type:'line',data:{labels,datasets},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(2)+(suf?' '+suf:'')}}},
-  elements:{point:{radius:4,hoverRadius:6},line:{tension:0.2}},scales:sc(yMin,yMax)}});
-};
-const grp=(id,labels,datasets,yMin,yMax)=>{
-  new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(2)}}},scales:sc(yMin,yMax)}});
-};
-const stk=(id,labels,datasets)=>{
-  new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},
-  scales:{x:{grid:{display:false},ticks:{color:TS,font:{size:11}},stacked:true},y:{grid:{color:GR},ticks:{color:TS,font:{size:11},callback:v=>v+'%'},stacked:true,max:100}}}});
-};
-const ds=(l,d,c)=>({label:l,data:d,backgroundColor:c,borderColor:c,borderRadius:4,maxBarThickness:48,fill:false,pointBackgroundColor:c});
+    </main>
 
-// ── OVERVIEW ──
-bp('ov_comp',['Low','Moderate','High'],[60,51.4,28.6],[BL,TL,CO],0,80,'%');
-grp('ov_adapt',['Enjoyment','Engagement','Clarity'],[
-  ds('No adapt.',[3.54,3.87,3.85],PU),ds('With adapt.',[3.10,3.41,3.38],AM)
-],2.0,4.5);
-
-// ── SURVEY ──
-bp('s_enj_i',IL,[3.467,3.523,3.024],[BL,TL,CO],2.0,4.5);
-bp('s_eng_i',IL,[3.920,3.730,3.375],[BL,TL,CO],2.0,4.5);
-bp('s_scaf_i',IL,[3.928,3.605,3.464],[BL,TL,CO],2.0,4.5);
-bp('s_enj_a',['No adaptability','With adaptability'],[3.538,3.096],[PU,AM],2.0,4.5);
-bp('s_eng_a',['No adaptability','With adaptability'],[3.865,3.408],[PU,AM],2.0,4.5);
-bp('s_scaf_a',['No adaptability','With adaptability'],[3.846,3.384],[PU,AM],2.0,4.5);
-
-// ── ALL 10 ITEMS ──
-const iLbls=['Felt engaged','Want to continue','Paid attention','Enjoyed','Play again','Easy to figure out','Appropriate challenge','Levels helped','Levels prepared','Felt confident'];
-new Chart(document.getElementById('items_i'),{type:'bar',data:{labels:iLbls,datasets:[
-  {label:'Low',data:[4.08,3.28,3.76,3.92,3.20,3.92,3.76,4.12,4.20,3.64],backgroundColor:BL,borderRadius:3,maxBarThickness:16},
-  {label:'Moderate',data:[3.919,3.514,3.541,3.703,3.351,3.351,3.351,3.919,3.730,3.676],backgroundColor:TL,borderRadius:3,maxBarThickness:16},
-  {label:'High',data:[3.536,2.786,3.214,3.321,2.964,3.286,3.321,3.786,3.679,3.250],backgroundColor:CO,borderRadius:3,maxBarThickness:16}
-]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{min:1,max:5,grid:{color:GR},ticks:{color:TS,font:{size:11}}},y:{grid:{display:false},ticks:{color:TS,font:{size:10}}}}}});
-new Chart(document.getElementById('items_a'),{type:'bar',data:{labels:iLbls,datasets:[
-  {label:'No adaptability',data:[4.019,3.423,3.712,3.808,3.385,3.615,3.750,4.077,4.058,3.731],backgroundColor:PU,borderRadius:3,maxBarThickness:20},
-  {label:'With adaptability',data:[3.605,2.947,3.211,3.421,2.921,3.316,3.053,3.737,3.553,3.263],backgroundColor:AM,borderRadius:3,maxBarThickness:20}
-]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{min:1,max:5,grid:{color:GR},ticks:{color:TS,font:{size:11}}},y:{grid:{display:false},ticks:{color:TS,font:{size:10}}}}}});
-
-// ── PERFORMANCE ──
-bp('p_st_i',IL,[0.880,1.297,1.143],[BL,TL,CO],0,2.0);
-bp('p_st_a',['No adaptability','With adaptability'],[1.269,0.947],[PU,AM],0,2.0);
-new Chart(document.getElementById('p_d_i'),{type:'bar',data:{labels:IL,datasets:[
-  {label:'Before',data:[10.28,14.46,7.07],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:26},
-  {label:'After',data:[9.04,7.07,7.07],backgroundColor:[BLA,TLA,COA],borderRadius:4,maxBarThickness:26}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:sc(0,18)}});
-new Chart(document.getElementById('p_d_a'),{type:'bar',data:{labels:['No adaptability','With adaptability'],datasets:[
-  {label:'Before',data:[11.35,10.53],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:30},
-  {label:'After',data:[6.94,8.56],backgroundColor:[PUA,AMA],borderRadius:4,maxBarThickness:30}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:sc(0,16)}});
-new Chart(document.getElementById('p_t_i'),{type:'bar',data:{labels:IL,datasets:[
-  {label:'Before',data:[518,577,242],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:26},
-  {label:'After',data:[278,231,213],backgroundColor:[BLA,TLA,COA],borderRadius:4,maxBarThickness:26}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:sc(0,700)}});
-new Chart(document.getElementById('p_t_a'),{type:'bar',data:{labels:['No adaptability','With adaptability'],datasets:[
-  {label:'Before',data:[418,509],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:30},
-  {label:'After',data:[248,224],backgroundColor:[PUA,AMA],borderRadius:4,maxBarThickness:30}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:sc(0,700)}});
-new Chart(document.getElementById('p_b_i'),{type:'bar',data:{labels:IL,datasets:[
-  {label:'Before',data:[1.769,1.867,1.871],backgroundColor:[BL,TL,CO],borderRadius:4,maxBarThickness:26},
-  {label:'After',data:[1.769,1.738,1.783],backgroundColor:[BLA,TLA,COA],borderRadius:4,maxBarThickness:26}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:sc(1.4,2.2)}});
-new Chart(document.getElementById('p_b_a'),{type:'bar',data:{labels:['No adaptability','With adaptability'],datasets:[
-  {label:'Before',data:[1.863,1.811],backgroundColor:[PU,AM],borderRadius:4,maxBarThickness:30},
-  {label:'After',data:[1.814,1.685],backgroundColor:[PUA,AMA],borderRadius:4,maxBarThickness:30}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:sc(1.4,2.2)}});
-
-// ── PER LEVEL ──
-ln('l_ti_i',LVLS,[
-  {label:'Low',data:[38.72,6.85,5.13,29.28,20.90,51.82,96.25],borderColor:BL,pointBackgroundColor:BL,fill:false},
-  {label:'Moderate',data:[37.95,7.47,5.03,23.47,19.41,28.88,49.53],borderColor:TL,pointBackgroundColor:TL,fill:false},
-  {label:'High',data:[43.22,10.39,5.64,27.23,16.94,32.63,37.23],borderColor:CO,pointBackgroundColor:CO,fill:false}
-],0,120,'s');
-ln('l_ti_a',LVLS,[
-  {label:'No adapt.',data:[40.30,8.00,5.18,27.00,18.88,42.19,51.66],borderColor:PU,pointBackgroundColor:PU,fill:false},
-  {label:'With adapt.',data:[39.29,8.40,5.29,25.40,19.30,29.22,66.13],borderColor:AM,pointBackgroundColor:AM,fill:false}
-],0,120,'s');
-ln('l_bp_i',LVLS,[
-  {label:'Low',data:[0.180,2.645,1.759,3.503,1.969,2.319,2.599],borderColor:BL,pointBackgroundColor:BL,fill:false},
-  {label:'Moderate',data:[0.186,2.739,1.868,3.371,2.021,2.628,2.584],borderColor:TL,pointBackgroundColor:TL,fill:false},
-  {label:'High',data:[0.244,2.753,2.209,3.049,1.920,2.450,2.554],borderColor:CO,pointBackgroundColor:CO,fill:false}
-],0,4.5,'BPS');
-ln('l_bp_a',LVLS,[
-  {label:'No adapt.',data:[0.192,2.639,1.899,3.443,1.968,2.440,2.674],borderColor:PU,pointBackgroundColor:PU,fill:false},
-  {label:'With adapt.',data:[0.212,2.824,1.989,3.154,1.988,2.560,2.427],borderColor:AM,pointBackgroundColor:AM,fill:false}
-],0,4.5,'BPS');
-new Chart(document.getElementById('l_n'),{type:'bar',data:{labels:LVLS,datasets:[{label:'N',data:[90,83,80,77,72,65,44],backgroundColor:BL,borderRadius:4,maxBarThickness:36}]},
-options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' N = '+c.parsed.y}}},scales:sc(0,95)}});
-
-// ── COMPLETION ──
-stk('c_i',IL,[
-  {label:'Completed',data:[60,51.4,28.6],backgroundColor:BL,borderRadius:4,maxBarThickness:55},
-  {label:'Did not',data:[40,48.6,71.4],backgroundColor:GY,borderRadius:4,maxBarThickness:55}
-]);
-stk('c_a',['No adaptability','With adaptability'],[
-  {label:'Completed',data:[51.9,39.5],backgroundColor:PU,borderRadius:4,maxBarThickness:65},
-  {label:'Did not',data:[48.1,60.5],backgroundColor:GY,borderRadius:4,maxBarThickness:65}
-]);
-grp('c_int',['Low implicitness','Moderate implicitness','High implicitness'],[
-  ds('No adapt.',[56.2,60.0,37.5],PU),ds('With adapt.',[66.7,41.2,16.7],AM)
-],0,80,'%');
-
-// ── INTERACTION ──
-grp('int_bar',IL,[
-  ds('No adapt.',[2.854,3.917,3.750],PU),ds('With adapt.',[3.250,3.059,2.963],AM)
-],2.0,4.5);
-ln('int_line',IL,[
-  {label:'No adapt.',data:[2.854,3.917,3.750],borderColor:PU,pointBackgroundColor:PU,fill:false},
-  {label:'With adapt.',data:[3.250,3.059,2.963],borderColor:AM,pointBackgroundColor:AM,fill:false}
-],2.0,4.5);
-ln('int_eng',IL,[
-  {label:'No adapt.',data:[3.438,4.075,4.031],borderColor:PU,pointBackgroundColor:PU,fill:false},
-  {label:'With adapt.',data:[3.292,3.324,3.722],borderColor:AM,pointBackgroundColor:AM,fill:false}
-],2.5,4.5);
-ln('int_scaf',IL,[
-  {label:'No adapt.',data:[3.588,3.960,3.962],borderColor:PU,pointBackgroundColor:PU,fill:false},
-  {label:'With adapt.',data:[3.300,3.188,3.867],borderColor:AM,pointBackgroundColor:AM,fill:false}
-],2.5,4.5);
-
-// ── DEMOGRAPHICS ──
-const gCols=[BL,CO,GY];
-const grCols=[BL,TL,CO,PU];
-bp('d_ge_enj',['Male','Female','Other'],[3.558,3.067,3.333],gCols,2.0,4.5);
-bp('d_ge_eng',['Male','Female','Other'],[3.908,3.329,3.750],gCols,2.0,4.5);
-bp('d_ge_scaf',['Male','Female','Other'],[3.902,3.280,3.767],gCols,2.0,4.5);
-bp('d_ge_comp',['Male','Female','Other'],[61.2,22.9,66.7],gCols,0,80,'%');
-bp('d_ge_stars',['Male','Female','Other'],[1.286,1.000,0.667],gCols,0,2.0);
-bp('d_gr_deaths',['Grade 9','Grade 10','Grade 11','Grade 12'],[8.47,5.67,6.38,13.92],grCols,0,18);
-bp('d_gr_time',['Grade 9','Grade 10','Grade 11','Grade 12'],[265,201,204,341],grCols,0,400,'s');
-bp('d_gr_enj',['Gr 9','Gr 10','Gr 11','Gr 12'],[3.519,3.289,3.295,3.375],grCols,2.0,4.5);
-bp('d_gr_eng',['Gr 9','Gr 10','Gr 11','Gr 12'],[3.889,3.500,3.615,3.844],grCols,2.0,4.5);
-bp('d_gr_comp',['Gr 9','Gr 10','Gr 11','Gr 12'],[61.1,33.3,53.8,43.8],grCols,0,80,'%');
-bp('d_age_deaths',['Age 14','Age 15','Age 16','Age 17','Age 18'],[11.29,5.64,5.50,11.50,10.86],[BL,TL,CO,PU,GY],0,16);
-grp('d_age_subj',['Age 14','Age 15','Age 16','Age 17','Age 18'],[
-  {label:'Enjoyment',data:[3.810,3.385,3.267,3.133,3.762],backgroundColor:BL,borderRadius:4,maxBarThickness:28},
-  {label:'Engagement',data:[4.071,3.615,3.500,3.775,3.929],backgroundColor:TL,borderRadius:4,maxBarThickness:28}
-],2.0,4.5);
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
