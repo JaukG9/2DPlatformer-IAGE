@@ -142,6 +142,17 @@ bp('s_enj_a', ['No adaptability', 'With adaptability'], [3.538, 3.096], [PU, AM]
 bp('s_eng_a', ['No adaptability', 'With adaptability'], [3.865, 3.408], [PU, AM], 2.0, 4.5);
 bp('s_scaf_a', ['No adaptability', 'With adaptability'], [3.846, 3.384], [PU, AM], 2.0, 4.5);
 
+// Survey composites — all three composites grouped (Figure 2a style)
+grp('s_all_i', ['Enjoyment', 'Engagement', 'Clarity'], [
+    ds('Low', [3.467, 3.920, 3.928], BL),
+    ds('Moderate', [3.523, 3.730, 3.605], TL),
+    ds('High', [3.024, 3.375, 3.464], CO)
+], 2.0, 4.5);
+grp('s_all_a', ['Enjoyment', 'Engagement', 'Clarity'], [
+    ds('No adapt.', [3.538, 3.865, 3.846], PU),
+    ds('With adapt.', [3.096, 3.408, 3.384], AM)
+], 2.0, 4.5);
+
 // All 10 items
 const iLbls = ['Felt engaged', 'Want to continue', 'Paid attention', 'Enjoyed', 'Play again', 'Easy to figure out', 'Appropriate challenge', 'Levels helped', 'Levels prepared', 'Felt confident'];
 new Chart(document.getElementById('items_i'), {
