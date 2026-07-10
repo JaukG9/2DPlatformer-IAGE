@@ -332,28 +332,28 @@ p1_1 <- comp_bar(df$completed, df$implicitness,
 y1_2 <- df$enjoyment
 r1_2 <- do_anova(y1_2, df$implicitness, "1.2 Enjoyment", "S1-Implicitness")
 p1_2 <- bar_plot(y1_2, df$implicitness, COL3,
-                 "Enjoyment by Implicitness", "Mean score (1–5)",
+                 "Enjoyment by Implicitness", "Mean score (1-5)",
                  1, 5, r1_2$sig)
 
 ## 1.3 Engagement
 y1_3 <- df$engagement
 r1_3 <- do_anova(y1_3, df$implicitness, "1.3 Engagement", "S1-Implicitness")
 p1_3 <- bar_plot(y1_3, df$implicitness, COL3,
-                 "Engagement by Implicitness", "Mean score (1–5)",
+                 "Engagement by Implicitness", "Mean score (1-5)",
                  1, 5, r1_3$sig)
 
 ## 1.4 Clarity
 y1_4 <- df$clarity
 r1_4 <- do_anova(y1_4, df$implicitness, "1.4 Clarity", "S1-Implicitness")
 p1_4 <- bar_plot(y1_4, df$implicitness, COL3,
-                 "Clarity by Implicitness", "Mean score (1–5)",
+                 "Clarity by Implicitness", "Mean score (1-5)",
                  1, 5, r1_4$sig)
 
 ## 1.5 Stars
 y1_5 <- remove_outliers(df$stars)
 r1_5 <- do_anova(y1_5, df$implicitness, "1.5 Stars", "S1-Implicitness")
 p1_5 <- bar_plot(y1_5, df$implicitness, COL3,
-                 "Stars by Implicitness", "Mean stars (0–4)",
+                 "Stars by Implicitness", "Mean stars (0-4)",
                  0, 4, r1_5$sig)
 
 ## 1.6 Deaths
@@ -424,28 +424,28 @@ p2_1 <- comp_bar(df$completed, df$adaptability,
 y2_2 <- df$enjoyment
 r2_2 <- do_ttest(y2_2, df$adaptability, "2.2 Enjoyment", "S2-Adaptability")
 p2_2 <- bar_plot(y2_2, df$adaptability, COL2,
-                 "Enjoyment by Adaptability", "Mean score (1–5)",
+                 "Enjoyment by Adaptability", "Mean score (1-5)",
                  1, 5, r2_2$sig)
 
 ## 2.3 Engagement
 y2_3 <- df$engagement
 r2_3 <- do_ttest(y2_3, df$adaptability, "2.3 Engagement", "S2-Adaptability")
 p2_3 <- bar_plot(y2_3, df$adaptability, COL2,
-                 "Engagement by Adaptability", "Mean score (1–5)",
+                 "Engagement by Adaptability", "Mean score (1-5)",
                  1, 5, r2_3$sig)
 
 ## 2.4 Clarity
 y2_4 <- df$clarity
 r2_4 <- do_ttest(y2_4, df$adaptability, "2.4 Clarity", "S2-Adaptability")
 p2_4 <- bar_plot(y2_4, df$adaptability, COL2,
-                 "Clarity by Adaptability", "Mean score (1–5)",
+                 "Clarity by Adaptability", "Mean score (1-5)",
                  1, 5, r2_4$sig)
 
 ## 2.5 Stars
 y2_5 <- remove_outliers(df$stars)
 r2_5 <- do_ttest(y2_5, df$adaptability, "2.5 Stars", "S2-Adaptability")
 p2_5 <- bar_plot(y2_5, df$adaptability, COL2,
-                 "Stars by Adaptability", "Mean stars (0–4)",
+                 "Stars by Adaptability", "Mean stars (0-4)",
                  0, 4, r2_5$sig)
 
 ## 2.6 Deaths
@@ -514,7 +514,7 @@ y3_2 <- df$enjoyment
 r3_2 <- do_twoway(y3_2, df$implicitness, df$adaptability,
                   "3.2 Enjoyment", "S3-Interaction")
 p3_2 <- int_plot(y3_2, df$implicitness, df$adaptability,
-                 "Enjoyment Interaction", "Mean score (1–5)",
+                 "Enjoyment Interaction", "Mean score (1-5)",
                  1, 5, r3_2$sig_int)
 
 ## 3.3 Engagement
@@ -522,7 +522,7 @@ y3_3 <- df$engagement
 r3_3 <- do_twoway(y3_3, df$implicitness, df$adaptability,
                   "3.3 Engagement", "S3-Interaction")
 p3_3 <- int_plot(y3_3, df$implicitness, df$adaptability,
-                 "Engagement Interaction", "Mean score (1–5)",
+                 "Engagement Interaction", "Mean score (1-5)",
                  1, 5, r3_3$sig_int)
 
 ## 3.4 Clarity
@@ -530,7 +530,7 @@ y3_4 <- df$clarity
 r3_4 <- do_twoway(y3_4, df$implicitness, df$adaptability,
                   "3.4 Clarity", "S3-Interaction")
 p3_4 <- int_plot(y3_4, df$implicitness, df$adaptability,
-                 "Clarity Interaction", "Mean score (1–5)",
+                 "Clarity Interaction", "Mean score (1-5)",
                  1, 5, r3_4$sig_int)
 
 ## 3.5 Stars
@@ -538,7 +538,7 @@ y3_5 <- remove_outliers(df$stars)
 r3_5 <- do_twoway(y3_5, df$implicitness, df$adaptability,
                   "3.5 Stars", "S3-Interaction")
 p3_5 <- int_plot(y3_5, df$implicitness, df$adaptability,
-                 "Stars Interaction", "Mean stars (0–4)",
+                 "Stars Interaction", "Mean stars (0-4)",
                  0, 4, r3_5$sig_int)
 
 ## 3.6 Deaths
