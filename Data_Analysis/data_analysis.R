@@ -52,7 +52,7 @@ df$completed <- as.numeric(df$completion_raw == "Yes")
 
 df$engagement <- rowMeans(df[, c("q_engaged", "q_attention")])
 df$enjoyment <- rowMeans(df[, c("q_continue", "q_enjoyed", "q_again")])
-df$scaffolding <- rowMeans(df[, c("q_figure", "q_challenge", "q_helped",
+df$clarity <- rowMeans(df[, c("q_figure", "q_challenge", "q_helped",
                                   "q_prepared", "q_confident")])
 
 df$l6_time <- ifelse(df$l6_time_raw > 0, df$l6_time_raw, NA)
@@ -342,11 +342,11 @@ p1_3 <- bar_plot(y1_3, df$implicitness, COL3,
                  "Engagement by Implicitness", "Mean score (1–5)",
                  1, 5, r1_3$sig)
 
-## 1.4 Scaffolding
-y1_4 <- df$scaffolding
-r1_4 <- do_anova(y1_4, df$implicitness, "1.4 Scaffolding", "S1-Implicitness")
+## 1.4 Clarity
+y1_4 <- df$clarity
+r1_4 <- do_anova(y1_4, df$implicitness, "1.4 Clarity", "S1-Implicitness")
 p1_4 <- bar_plot(y1_4, df$implicitness, COL3,
-                 "Scaffolding by Implicitness", "Mean score (1–5)",
+                 "Clarity by Implicitness", "Mean score (1–5)",
                  1, 5, r1_4$sig)
 
 ## 1.5 Stars
@@ -434,11 +434,11 @@ p2_3 <- bar_plot(y2_3, df$adaptability, COL2,
                  "Engagement by Adaptability", "Mean score (1–5)",
                  1, 5, r2_3$sig)
 
-## 2.4 Scaffolding
-y2_4 <- df$scaffolding
-r2_4 <- do_ttest(y2_4, df$adaptability, "2.4 Scaffolding", "S2-Adaptability")
+## 2.4 Clarity
+y2_4 <- df$clarity
+r2_4 <- do_ttest(y2_4, df$adaptability, "2.4 Clarity", "S2-Adaptability")
 p2_4 <- bar_plot(y2_4, df$adaptability, COL2,
-                 "Scaffolding by Adaptability", "Mean score (1–5)",
+                 "Clarity by Adaptability", "Mean score (1–5)",
                  1, 5, r2_4$sig)
 
 ## 2.5 Stars
@@ -525,12 +525,12 @@ p3_3 <- int_plot(y3_3, df$implicitness, df$adaptability,
                  "Engagement Interaction", "Mean score (1–5)",
                  1, 5, r3_3$sig_int)
 
-## 3.4 Scaffolding
-y3_4 <- df$scaffolding
+## 3.4 Clarity
+y3_4 <- df$clarity
 r3_4 <- do_twoway(y3_4, df$implicitness, df$adaptability,
-                  "3.4 Scaffolding", "S3-Interaction")
+                  "3.4 Clarity", "S3-Interaction")
 p3_4 <- int_plot(y3_4, df$implicitness, df$adaptability,
-                 "Scaffolding Interaction", "Mean score (1–5)",
+                 "Clarity Interaction", "Mean score (1–5)",
                  1, 5, r3_4$sig_int)
 
 ## 3.5 Stars
